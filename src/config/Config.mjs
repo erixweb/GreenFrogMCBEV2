@@ -1,3 +1,4 @@
+import { __dirname } from '../utils/Directory.mjs'
 import properties from 'properties-parser'
 import * as node_path from 'node:path'
 import fs from 'fs'
@@ -48,7 +49,7 @@ class ServerConfig extends Config {
     }
 
     static create() {
-        const exists = fs.existsSync(this.path)        
+        const exists = fs.existsSync(this.path)
 
         if (!exists) {
             fs.copyFileSync(this.original_path, this.path)

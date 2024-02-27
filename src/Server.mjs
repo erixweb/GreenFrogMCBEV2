@@ -22,7 +22,7 @@ class Server {
     listen() {
         this._server = bedrock.createServer({
             host: this.host,
-            port: this.port,
+            port: Number(this.port),
             motd: {
                 motd: this.motd,
                 levelName: "GreenFrog"
