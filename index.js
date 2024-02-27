@@ -1,12 +1,15 @@
 import { ServerConfig } from "./src/config/Config.mjs"
+import { Address } from "./src/network/Address.mjs"
 import { Server } from "./src/Server.mjs"
 
 ServerConfig.create()
 ServerConfig.init()
 
 const server = new Server(
-    ServerConfig.get("host"),
-    ServerConfig.get("port")
+    new Address(
+        ServerConfig.get("host"),
+        ServerConfig.get("port")    
+    )
 )
 
 server.listen()

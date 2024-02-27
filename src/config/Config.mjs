@@ -4,9 +4,14 @@ import * as node_path from 'node:path'
 import fs from 'fs'
 
 class Config {
+    /** @type {import('Config').ConfigCache} */
     static cache
 
+    /** @type {string} */
     static path
+
+    /** @type {string} */
+    static original_path
 
     static parse() {
         throw new Error('This should be implemented by sub-classes')
@@ -26,8 +31,10 @@ class Config {
 }
 
 class ServerConfig extends Config {
+    /** @type {import('Config').ConfigCache} */
     static cache = []
 
+    /** @type {string} */
     static path = node_path.join(
         __dirname,
         "..",
@@ -35,6 +42,7 @@ class ServerConfig extends Config {
         "server.properties"
     )
 
+    /** @type {string} */
     static original_path = node_path.join(
         __dirname,
         "..",
@@ -45,7 +53,7 @@ class ServerConfig extends Config {
     )
 
     static parse() {
-        return properties.parse(fs.readFileSync(this.path))
+        return properties.parse(fs.readFileSync(this.path).toString())
     }
 
     static create() {
@@ -62,7 +70,7 @@ class ServerConfig extends Config {
         this.cache = this.parse()
     }
 
-    static get(key) {
+    static get(/** @type {string} */ key) {
         return this.cache[key]
     }
 }

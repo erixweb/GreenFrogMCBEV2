@@ -6,6 +6,7 @@
   "license": "CC-BY-4.0",
   "version": "3.9.0",
   "dependencies": {
+    "@kotinash/better-events": "^1.0.3",
     "frog-protocol": "github:GreenFrogMCBE/protocol",
     "properties-parser": "^0.6.0"
   },

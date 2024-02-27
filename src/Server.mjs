@@ -1,28 +1,32 @@
+import { Address } from './network/Address.mjs'
+import { Logger } from './logger/Logger.mjs'
 import bedrock from 'frog-protocol'
 
 class Server {
-    host
+    /** @type {Address} */
+    address
 
-    port
-
+    /** @type {string} */
     motd
 
+    /** @type {Logger} */
+    logger = new Logger("")
+
+    /** @type {import("frog-protocol").Server | undefined} */
     _server
 
     constructor(
-        _host = "127.0.0.1",
-        _port = 19132,
-        _motd = "A GreenFrog Server"
+        /** @type {Address} */ address,
+        /** @type {string} */ motd = "A GreenFrog Server"
     ) {
-        this.host = _host
-        this.port = _port
-        this.motd = _motd
+        this.address = address
+        this.motd = motd
     }
 
     listen() {
         this._server = bedrock.createServer({
-            host: this.host,
-            port: Number(this.port),
+            host: this.address.host,
+            port: Number(this.address.port),
             motd: {
                 motd: this.motd,
                 levelName: "GreenFrog"
@@ -30,12 +34,8 @@ class Server {
         })
     }
 
-    stop() {
+    shutdown() {
         // TODO
-    }
-
-    getAddress() {
-        return `${host}:${port}`
     }
 }
 
