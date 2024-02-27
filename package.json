@@ -1,0 +1,13 @@
+{
+  "name": "greenfrog",
+  "description": "A server software for MCBE",
+  "main": "index.js",
+  "author": "GreenFrogMCBE",
+  "license": "CC-BY-4.0",
+  "version": "3.9.0",
+  "dependencies": {
+    "frog-protocol": "github:GreenFrogMCBE/protocol",
+    "properties-parser": "^0.6.0"
+  },
+  "type": "module"
+}

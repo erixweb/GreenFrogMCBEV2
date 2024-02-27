@@ -1,0 +1,6 @@
+# Node.JS modules
+node_modules/
+bun.lockb
+
+# Config files
+server.properties
