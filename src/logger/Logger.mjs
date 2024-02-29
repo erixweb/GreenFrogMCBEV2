@@ -10,16 +10,6 @@ class LogLevel {
 }
 
 class Logger {
-	/** @type {string} */
-	name
-
-	/**
-	 * @param {string} name 
-	 */
-	constructor(name) {
-		this.name = name
-	}
-
 	/**
 	 * @param {LogLevel} level 
 	 * @param {string} text

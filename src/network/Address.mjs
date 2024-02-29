@@ -5,9 +5,13 @@ class Address {
 	/** @type {number} */
 	port
 
+	/**
+	 * @param {string} host
+	 * @param {number} port
+	 */
 	constructor(
-		/** @type {string} */ host,
-		/** @type {number} */ port
+		host,
+		port
 	) {
 		this.host = host
 		this.port = port
