@@ -15,15 +15,21 @@ class Server {
     /** @type {import("frog-protocol").Server | undefined} */
     _server
 
+    /**
+     * @param {Address} address 
+     * @param {string} motd 
+     */
     constructor(
-        /** @type {Address} */ address,
-        /** @type {string} */ motd = "A GreenFrog Server"
+        address,
+        motd = "A GreenFrog Server"
     ) {
         this.address = address
         this.motd = motd
     }
 
     listen() {
+        Logger.info("Loading...")
+
         this._server = bedrock.createServer({
             host: this.address.host,
             port: Number(this.address.port),
@@ -35,7 +41,7 @@ class Server {
     }
 
     shutdown() {
-        // TODO
+        this._server?.close()
     }
 }
 

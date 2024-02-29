@@ -1,6 +1,9 @@
 {
 	"compilerOptions": {
 		"strict": true,
-		"checkJs": true
+		"checkJs": true,
+		"target": "ES2015",
+		"module": "NodeNext",
+		"moduleResolution": "nodenext"
 	}
 }
