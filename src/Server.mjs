@@ -1,9 +1,9 @@
-import bedrock, { Connection, Player as BPlayer } from 'frog-protocol'
+import { bedrock, Connection, Player as BPlayer } from './utils/ProtocolFix.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { EventType } from './events/EventType.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
-import { Player } from './player/Player.mjs'
+import { Language } from './config/Language.mjs'
 
 class Server {
     /** @type {Address} */
@@ -11,6 +11,9 @@ class Server {
 
     /** @type {string} */
     motd
+
+    /** @type {string} */
+    name
 
     /** @type {Logger} */
     logger = new Logger()
@@ -20,18 +23,21 @@ class Server {
 
     /**
      * @param {Address} address 
-     * @param {string} motd 
+     * @param {string} [motd]
+     * @param {string} [name]
      */
     constructor(
         address,
-        motd = "A GreenFrog Server"
+        motd = "A GreenFrog Server",
+        name = "Default"
     ) {
         this.address = address
         this.motd = motd
+        this.name = name
     }
 
     listen() {
-        Logger.info("Loading...")
+        Logger.info(Language.get_key("server.starting", [ this.name ]))
 
         this._server = bedrock.createServer({
             host: this.address.host,

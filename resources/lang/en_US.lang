@@ -1,3 +1,3 @@
-server.loading=Loading...
+server.starting=Starting server %s
 
 player.connected=Player %s connected

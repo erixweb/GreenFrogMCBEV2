@@ -4,4 +4,4 @@ node_modules/
 bun.lockb
 
 # Config files
-./server.properties
+server.properties

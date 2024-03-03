@@ -1,7 +1,8 @@
 import { LanguageParser } from '@greenfrog/lang-parser'
+import { __dirname } from '../utils/Directory.mjs'
+import { ServerConfig } from './Config.mjs'
 import path from 'path'
 import fs from 'fs'
-import { ServerConfig } from './Config.mjs'
 
 class Language {
 	/**
@@ -19,7 +20,7 @@ class Language {
 	 * @returns {string} 
 	 */
 	static get_language(lang) {
-		const lang_path = path.resolve(__dirname, "..", "..", "resources", "lang", lang)
+		const lang_path = path.resolve(__dirname, "..", "..", "resources", "lang")
 		const lang_file = path.join(lang_path, `${lang}.lang`)
 
 		if (!fs.existsSync(lang_file)) {
@@ -32,7 +33,7 @@ class Language {
 	}
 
 	static init() {
-		const language = ServerConfig.get("lang")
+		const language = ServerConfig.get("language")
 
 		this.#cache = LanguageParser.parse_raw(this.get_language(language))
 	}
