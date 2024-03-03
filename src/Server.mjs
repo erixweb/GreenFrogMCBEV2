@@ -1,6 +1,7 @@
-import { bedrock, Connection, Player as BPlayer } from './utils/ProtocolFix.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { EventType } from './events/EventType.mjs'
+import { ServerConfig } from './config/Config.mjs'
+import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
@@ -15,6 +16,9 @@ class Server {
     /** @type {string} */
     name
 
+    /** @type {string} */
+    version
+
     /** @type {Logger} */
     logger = new Logger()
 
@@ -23,17 +27,21 @@ class Server {
 
     /**
      * @param {Address} address 
-     * @param {string} [motd]
-     * @param {string} [name]
+     * @param {string} [motd=ServerConfig.get("motd")]
+     * @param {string} [name=ServerConfig.get("server_name")]
+     * @param {string} [version=ServerConfig.get("version")] 
      */
     constructor(
         address,
-        motd = "A GreenFrog Server",
-        name = "Default"
+        motd = ServerConfig.get("motd"),
+        name = ServerConfig.get("server_name"),
+        version = ServerConfig.get("version"),
+        max_players = ServerConfig
     ) {
         this.address = address
         this.motd = motd
         this.name = name
+        this.version = version
     }
 
     listen() {
@@ -83,10 +91,10 @@ class Server {
     }
 
     /**
-     * @param {Connection} connection 
+     * @param {import("frog-protocol").Connection} connection 
      */
     #handle_connection(connection) {
-        /** @param {BPlayer} player */
+        /** @param {import("frog-protocol").Player} player */
         connection.on("join", (player) => {
         })
 
