@@ -4,6 +4,10 @@ import { Address } from "./src/network/Address.mjs"
 import { Logger } from "./src/logger/Logger.mjs"
 import { Server } from "./src/Server.mjs"
 
+if (parseFloat(process.versions.node) < 14) {
+    throw new Error("Your Node.JS version is too old, please update to the latest one from https://nodejs.org/")
+}
+
 ServerConfig.create()
 ServerConfig.init()
 
