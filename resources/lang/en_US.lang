@@ -1,3 +1,3 @@
-server.starting=Starting server %s
+server.starting=Starting server "%0"
 
-player.connected=Player %s connected
+player.connected=Player "%0" connected

@@ -1,9 +1,9 @@
 import { bedrock, Connection, Player as BPlayer } from './utils/ProtocolFix.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { EventType } from './events/EventType.mjs'
+import { Language } from './config/Language.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
-import { Language } from './config/Language.mjs'
 
 class Server {
     /** @type {Address} */
@@ -61,6 +61,25 @@ class Server {
                 )
             )
         })
+
+        setInterval(() => {
+            this.tick()
+        }, 1000)
+    }
+
+    /**
+     * Ticks the server
+     * Useful for scheduling things without using setInterval()
+     */
+    tick() {
+        EventEmitter.emit(
+            new Event(
+                EventType.ServerTick,
+                {
+                    server: this,
+                }
+            )
+        )
     }
 
     /**

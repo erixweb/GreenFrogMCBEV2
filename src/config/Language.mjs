@@ -45,7 +45,7 @@ class Language {
 	 */
 	static get_key(key, placeholders = []) {
 		const result = LanguageParser.get_key(key, this.#cache, placeholders)
-
+	
 		if (!result) {
 			return `lang error (invalid key): get_key(${key}, ${placeholders})`
 		}
