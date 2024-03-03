@@ -28,28 +28,35 @@ class Server {
     /** @type {number} */
     max_players
 
+    /** @type {boolean} */
+    internal = false
+
     /**
      * @param {Address} address 
      * @param {string} [motd=ServerConfig.get("motd")]
      * @param {string} [name=ServerConfig.get("server_name")]
-     * @param {string} [version=ServerConfig.get("version")] 
+     * @param {string} [version=ServerConfig.get("version")]
+     * @param {number} [max_players=ServerConfig.get("max_players")] 
+     * @param {boolean} [internal=false] 
      */
     constructor(
         address,
         motd = ServerConfig.get("motd"),
         name = ServerConfig.get("server_name"),
         version = ServerConfig.get("version"),
-        max_players = ServerConfig.get("max_players")
+        max_players = Number(ServerConfig.get("max_players")),
+        internal = false
     ) {
         this.address = address
         this.motd = motd
         this.name = name
         this.version = version
-        this.max_players = Number(max_players)
+        this.max_players = max_players
+        this.internal = internal
     }
 
     listen() {
-        Logger.info(Language.get_key("server.starting", [ this.name ]))
+        Logger.info(Language.get_key("server.starting", [this.name]))
 
         this._server = bedrock.createServer({
             host: this.address.host,
@@ -74,10 +81,18 @@ class Server {
                 )
             )
         })
+    }
 
+    #start_ticking() {
         setInterval(() => {
             this.tick()
         }, 1000)
+    }
+
+    start() {
+        if (!this.internal) this.listen()
+
+        this.#start_ticking()
     }
 
     /**
