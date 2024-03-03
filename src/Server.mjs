@@ -25,6 +25,9 @@ class Server {
     /** @type {import("frog-protocol").Server | undefined} */
     _server
 
+    /** @type {number} */
+    max_players
+
     /**
      * @param {Address} address 
      * @param {string} [motd=ServerConfig.get("motd")]
@@ -36,12 +39,13 @@ class Server {
         motd = ServerConfig.get("motd"),
         name = ServerConfig.get("server_name"),
         version = ServerConfig.get("version"),
-        max_players = ServerConfig
+        max_players = ServerConfig.get("max_players")
     ) {
         this.address = address
         this.motd = motd
         this.name = name
         this.version = version
+        this.max_players = Number(max_players)
     }
 
     listen() {
@@ -50,6 +54,7 @@ class Server {
         this._server = bedrock.createServer({
             host: this.address.host,
             port: Number(this.address.port),
+            maxPlayers: this.max_players,
             motd: {
                 motd: this.motd,
                 levelName: "GreenFrog"
