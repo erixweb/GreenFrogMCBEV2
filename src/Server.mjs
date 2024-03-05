@@ -6,6 +6,7 @@ import { Language } from './config/Language.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
 import { Player } from './player/Player.mjs'
+import { World } from './world/World.mjs'
 
 class Server {
     /** @type {Address} */
@@ -32,6 +33,9 @@ class Server {
     /** @type {boolean} */
     internal = false
 
+    /** @type {World[]} */
+    worlds = []
+
     /**
      * @param {Address} address 
      * @param {string} [motd=ServerConfig.get("motd")]
@@ -54,6 +58,10 @@ class Server {
         this.version = version
         this.max_players = max_players
         this.internal = internal
+        
+        this.worlds.push(
+            new World("world")
+        )
     }
 
     listen() {
