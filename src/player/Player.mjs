@@ -1,3 +1,4 @@
+import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
 import { EventType } from "../events/EventType.mjs"
@@ -37,6 +38,15 @@ class Player {
 		resource_pack_info.behavior_packs = []
 		resource_pack_info.resource_pack_links = []
 		resource_pack_info.write(connection)
+
+		const resource_pack_stack = new ResourcePackStack()
+		resource_pack_stack.must_accept = false
+		resource_pack_stack.resource_packs = []
+		resource_pack_stack.behavior_packs = []
+		resource_pack_stack.experiments = []
+		resource_pack_stack.game_version = "*"
+		resource_pack_stack.experiments_previously_used = false
+		resource_pack_stack.write(connection)		
 	}
 
 	#tick() {

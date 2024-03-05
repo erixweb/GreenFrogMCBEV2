@@ -1,4 +1,4 @@
-class TexturePackInfos {
+class ResourcePackInfos {
 	/** @type {string | undefined} */
 	uuid
 
@@ -37,4 +37,4 @@ class TexturePackInfos {
 	}
 }
 
-export { TexturePackInfos }
+export { ResourcePackInfos }
