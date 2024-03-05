@@ -5,6 +5,7 @@ import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
+import { Player } from './player/Player.mjs'
 
 class Server {
     /** @type {Address} */
@@ -62,6 +63,8 @@ class Server {
             host: this.address.host,
             port: Number(this.address.port),
             maxPlayers: this.max_players,
+            /** @ts-ignore idc */
+            version: this.version,
             motd: {
                 motd: this.motd,
                 levelName: "GreenFrog"
@@ -86,7 +89,7 @@ class Server {
     #start_ticking() {
         setInterval(() => {
             this.tick()
-        }, 1000)
+		}, ServerConfig.get("tick_delay"))
     }
 
     start() {
@@ -111,15 +114,22 @@ class Server {
     }
 
     /**
-     * @param {import("frog-protocol").Connection} connection 
+     * @param {import("frog-protocol").Player} connection 
      */
     #handle_connection(connection) {
-        /** @param {import("frog-protocol").Player} player */
-        connection.on("join", (player) => {
-        })
+        connection.on("join", () => {
+            const user_data = connection.getUserData()
+            const player = new Player(user_data.displayName, connection)
 
-        connection.on("close", () => {
-            // TODO
+            EventEmitter.emit(
+                new Event(
+                    EventType.PlayerJoin,
+                    {
+                        player
+                    }
+                ),
+                false
+            )
         })
     }
 

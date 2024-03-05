@@ -1,11 +1,13 @@
+import { Event, EventEmitter } from "@kotinash/better-events"
+import { EventType } from "../events/EventType.mjs"
+import { ServerConfig } from "../config/Config.mjs"
 import { Language } from "../config/Language.mjs"
 import { Logger } from "../logger/Logger.mjs"
-import { Connection } from "frog-protocol"
 
 class Player {
 	/**
 	 * @param {string} name 
-	 * @param {Connection} connection
+	 * @param {import("frog-protocol").Connection} connection
 	 * @param {boolean} [internal=false] Set this to true if you want to create fake players
 	 */
 	constructor(name, connection, internal = false) {
@@ -15,6 +17,22 @@ class Player {
 		if (!internal) {
 			Logger.info(Language.get_key("player.connected", [this.name]))
 		}
+
+		setInterval(() => {
+			this.tick()
+		}, ServerConfig.get("tick_delay"))
+	}
+
+	tick() {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerTick,
+				{
+					player: this
+				}
+			),
+			false
+		)
 	}
 }
 

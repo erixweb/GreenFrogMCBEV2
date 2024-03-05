@@ -1,3 +1,5 @@
+import assert from 'assert'
+
 class Address {
 	/** @type {string} */
 	host
@@ -13,6 +15,8 @@ class Address {
 		host,
 		port
 	) {
+		assert(port > 0)
+		
 		this.host = host
 		this.port = port
 	}
