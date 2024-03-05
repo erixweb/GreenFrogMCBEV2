@@ -63,7 +63,6 @@ class Server {
             host: this.address.host,
             port: Number(this.address.port),
             maxPlayers: this.max_players,
-            /** @ts-ignore idc */
             version: this.version,
             motd: {
                 motd: this.motd,
@@ -88,7 +87,7 @@ class Server {
 
     #start_ticking() {
         setInterval(() => {
-            this.tick()
+            this.#tick()
 		}, ServerConfig.get("tick_delay"))
     }
 
@@ -102,7 +101,7 @@ class Server {
      * Ticks the server
      * Useful for scheduling things without using setInterval()
      */
-    tick() {
+    #tick() {
         EventEmitter.emit(
             new Event(
                 EventType.ServerTick,
