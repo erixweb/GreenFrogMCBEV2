@@ -2,16 +2,17 @@ import { PermissionLevel } from "../../../permissions/PermissionLevel.mjs"
 import { ChatRestrictionLevel } from "../types/ChatRestrictionLevel.mjs"
 import { MovementAuthority } from "../types/MovementAuthority.mjs"
 import { EduResourceUri } from "../types/EduResourceUri.mjs"
+import { PropertyData } from "../types/PropertyData.mjs"
 import { Gamemode } from "../../../player/Gamemode.mjs"
 import { Gamerule } from "../../../world/Gamerule.mjs"
 import { Experiment } from "../types/Experiment.mjs"
 import { ItemState } from "../types/ItemState.mjs"
 import { Math } from "../../../utils/Math.mjs"
+import { UUID } from "../../../utils/UUID.mjs"
 import { Seed } from "../types/Seed.mjs"
 import { Packet } from "../Packet.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import { PropertyData } from "../types/PropertyData.mjs"
 
 class StartGame extends Packet {
 	name = "start_game"
@@ -183,7 +184,7 @@ class StartGame extends Packet {
 	world_name = ""
 
 	/** @type {string} */
-	premium_world_template_id = ""
+	premium_world_template_id = UUID.DEFAULT_UUID
 
 	/** @type {boolean} */
 	is_trial = false
@@ -225,7 +226,7 @@ class StartGame extends Packet {
 	block_pallette_checksum = [ 0, 0 ]
 
 	/** @type {string} */
-	world_template_id = ""
+	world_template_id = UUID.DEFAULT_UUID
 
 	/** @type {boolean} */
 	client_side_generation = false
