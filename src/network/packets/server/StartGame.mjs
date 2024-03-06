@@ -266,7 +266,7 @@ class StartGame extends Packet {
 			runtime_entity_id: String(this.entity_id),
 			player_gamemode: this.gamemode,
 			player_position: Math.vec3_to_json(this.player_position),
-			rotation: Math.vec2_to_json(this.rotation),
+			rotation: { x: this.rotation.x, z: this.rotation.y },
 			seed: this.seed.parts,
 			biome_type: this.biome_type,
 			biome_name: this.biome_name,
