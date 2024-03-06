@@ -11,6 +11,7 @@
     "chalk": "^5.3.0",
     "frog-protocol": "github:GreenFrogMCBE/protocol",
     "properties-parser": "^0.6.0",
+    "vec2": "^1.6.1",
     "vec3": "^0.1.10"
   },
   "type": "module"

@@ -1,12 +1,13 @@
 import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
+import { Entity, EntityType } from "../entity/Entity.js"
 import { EventType } from "../events/EventType.mjs"
 import { ServerConfig } from "../config/Config.mjs"
 import { Language } from "../config/Language.mjs"
 import { Logger } from "../logger/Logger.mjs"
 
-class Player {
+class Player extends Entity {
 	/** @type {string} */
 	name
 
@@ -19,6 +20,8 @@ class Player {
 	 * @param {boolean} [internal=false] Set this to true if you want to create fake players
 	 */
 	constructor(name, connection, internal = false) {
+		super(EntityType.Player)
+
 		this.name = name
 		this.connection = connection
 

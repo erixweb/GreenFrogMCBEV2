@@ -1,3 +1,6 @@
+import { Event, EventEmitter } from "@kotinash/better-events"
+import { EventType } from "../events/EventType.mjs"
+
 class EntityType {
 	static Player = "minecraft:player"
 }
@@ -5,6 +8,9 @@ class EntityType {
 class Entity {
 	/** @type {string | undefined} */
 	type
+
+	/** @type {number} */
+	ticks_alive = 0
 
 	/**
 	 * @param {string} type 
@@ -18,8 +24,18 @@ class Entity {
 	}
 
 	#tick() {
-
+		EventEmitter.emit(
+			new Event(
+				EventType.EntityTick,
+				{
+					entity: this
+				},
+				(() => {
+					this.ticks_alive++
+				})
+			)
+		)
 	}
 }
 
-export { Entity }
+export { Entity, EntityType }
