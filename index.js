@@ -22,4 +22,6 @@ const server = new Server(
     )
 )
 
+console.clear()
+
 server.start()

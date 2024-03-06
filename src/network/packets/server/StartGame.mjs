@@ -38,11 +38,17 @@ class StartGame extends Packet {
 	/** @type {string | undefined} */
 	biome_name
 
+	/** @type {number | undefined} */
+	generator
+
 	/** @type {string | undefined} */
 	dimension
 
 	/** @type {string} */
 	world_gamemode = Gamemode.Survival
+
+	/** @type {number | undefined} */
+	difficulty
 
 	/** @type {Vec3} */
 	spawn_position = new Vec3(0, 0, 0)
@@ -213,8 +219,8 @@ class StartGame extends Packet {
 	/** @type {string} */
 	multiplayer_correlation_id = ""
 
-	/** @type {string} */
-	server_authoritative_inventory = ""
+	/** @type {boolean} */
+	server_authoritative_inventory = true
 
 	/** @type {string} */
 	engine = ""
@@ -223,7 +229,7 @@ class StartGame extends Packet {
 	property_data = new PropertyData("", "", {})
 
 	/** @type {number[]} */
-	block_pallette_checksum = [ 0, 0 ]
+	block_pallette_checksum = [0, 0]
 
 	/** @type {string} */
 	world_template_id = UUID.DEFAULT_UUID
@@ -241,22 +247,18 @@ class StartGame extends Packet {
 	 * @param {import("frog-protocol").Connection} connection 
 	 */
 	write(connection) {
-		const gamerules_sanitized = []
+		let gamerules_sanitized = this.gamerules || []
 
-		for (const gamerule of this.gamerules) {
-			gamerules_sanitized.push(gamerule.toJSON())
+		if (this.gamerules[0] instanceof Gamerule) {
+			gamerules_sanitized = this.gamerules.map(gamerule => gamerule.toJSON())
 		}
 
-		const expirements_sanitized = []
+		const expirements_sanitized = this.experiments.map(expirement => expirement.toJSON())
 
-		for (const expirement of this.experiments) {
-			expirements_sanitized.push(expirement.toJSON())
-		}
+		let itemstates_sanitized = this.itemstates || []
 
-		const itemstates_sanitized = []
-
-		for (const itemstate of this.itemstates) {
-			itemstates_sanitized.push(itemstate.toJSON())
+		if (this.gamerules[0] instanceof ItemState) {
+			itemstates_sanitized = this.itemstates.map(itemstate => itemstate.toJSON())
 		}
 
 		connection.queue(this.name, {
@@ -269,10 +271,14 @@ class StartGame extends Packet {
 			biome_type: this.biome_type,
 			biome_name: this.biome_name,
 			dimension: this.dimension,
+			generator: this.generator,
 			world_gamemode: this.world_gamemode,
+			difficulty: this.difficulty,
 			spawn_position: Math.vec3_to_json(this.spawn_position),
 			achievements_disabled: this.achievements_disabled,
 			editor_world_type: this.editor_world_type,
+			created_in_editor: this.created_in_editor,
+			exported_from_editor: this.exported_from_editor,
 			day_cycle_stop_time: this.day_cycle_stop_time,
 			edu_offer: this.edu_offer,
 			edu_features_enabled: this.edu_features_enabled,
@@ -326,9 +332,10 @@ class StartGame extends Packet {
 			engine: this.engine,
 			property_data: this.property_data.toJSON(),
 			block_pallette_checksum: this.block_pallette_checksum,
+			world_template_id: this.world_template_id,
 			client_side_generation: this.client_side_generation,
 			block_network_ids_are_hashes: this.block_network_ids_are_hashes,
-			server_controlled_sound: this.server_controlled_sound 
+			server_controlled_sound: this.server_controlled_sound
 		})
 	}
 }

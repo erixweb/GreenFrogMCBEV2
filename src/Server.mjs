@@ -126,7 +126,7 @@ class Server {
     #handle_connection(connection) {
         connection.on("join", () => {
             const user_data = connection.getUserData()
-            const player = new Player(user_data.displayName, connection)
+            const player = new Player(user_data.displayName, connection, this)
 
             EventEmitter.emit(
                 new Event(

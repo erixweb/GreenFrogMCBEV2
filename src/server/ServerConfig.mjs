@@ -1,3 +1,4 @@
+import { __dirname } from '../utils/Directory.mjs'
 import { Config } from '../config/Config.mjs'
 import properties from 'properties-parser'
 import * as node_path from 'node:path'
