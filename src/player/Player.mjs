@@ -1,14 +1,19 @@
+import { AvailableEntityIdentifiers } from "../network/packets/server/AvailableEntityIdentifiers.mjs"
 import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLevel.mjs"
+import { BiomeDefinitionList } from "../network/packets/server/BiomeDefinitionList.mjs"
 import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
 import { MovementAuthority } from "../network/packets/types/MovementAuthority.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import { EditorWorldType } from "../network/packets/types/EditorWorldType.mjs"
 import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
+import entities from "../../resources/json/entities.json" with { type: "json" }
+import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
 import { PropertyData } from "../network/packets/types/PropertyData.mjs"
-import { PermissionLevel } from "../permissions/PermissionLevel.mjs"
+import { PlayStatus } from "../network/packets/server/PlayStatus.mjs"
 import { Difficulty } from "../network/packets/types/Difficulty.mjs"
+import { PermissionLevel } from "../permissions/PermissionLevel.mjs"
 import { StartGame } from "../network/packets/server/StartGame.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
@@ -55,6 +60,7 @@ class Player extends Entity {
 			Logger.info(Language.get_key("player.connected", [this.name]))
 
 			this.#send_packets()
+			this.send_play_status("player_spawn")
 			this.#spawn()
 		}
 
@@ -89,6 +95,14 @@ class Player extends Entity {
 		resource_pack_stack.game_version = "*"
 		resource_pack_stack.experiments_previously_used = false
 		resource_pack_stack.write(this.connection)
+
+		const available_entity_identifiers = new AvailableEntityIdentifiers()
+		available_entity_identifiers.nbt = entities.nbt
+		available_entity_identifiers.write(this.connection)
+
+		const biome_definition_list = new BiomeDefinitionList()
+		biome_definition_list.nbt = biomes.nbt
+		biome_definition_list.write(this.connection)
 
 		const default_world = this.server.worlds[0]
 
@@ -189,6 +203,26 @@ class Player extends Entity {
 				}
 			),
 			false
+		)
+	}
+
+	/**
+	 * @param {import("frog-protocol").PlayStatus} status 
+	 */
+	send_play_status(status) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerPlayStatusChange,
+				{
+					status,
+					player: this
+				},
+				(() => {
+					const play_status_packet = new PlayStatus()
+					play_status_packet.status = status
+					play_status_packet.write(this.connection)
+				})
+			)
 		)
 	}
 }

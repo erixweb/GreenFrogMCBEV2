@@ -1,14 +1,6 @@
-class PacketDirection {
-	static Server = "server"
-	static Client = "client"
-}
-
 class Packet {
 	/** @type {string | undefined} */
 	name
-
-	/** @type {PacketDirection | undefined} */
-	direction
 
 	/**
 	 * @param {import("frog-protocol").Connection} connection 
@@ -19,11 +11,11 @@ class Packet {
 
 	/**
 	 * @param {import("frog-protocol").Connection} connection 
-	 * @param {*} packet
+	 * @param {any} packet
 	 */
 	read(connection, packet) {
 		throw new Error("This should be implemented by sub-classes")
 	}
 }
 
-export { Packet, PacketDirection }
+export { Packet }

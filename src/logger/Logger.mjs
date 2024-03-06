@@ -44,7 +44,7 @@ class Logger {
 	static log(level, message) {
 		EventEmitter.emit(
 			new Event(
-				EventType.Log,
+				EventType.ServerLog,
 				{ message },
 				(() => this.#_log_event_callback(level, message))
 			)
