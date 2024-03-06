@@ -1,6 +1,6 @@
 import { EventEmitter, Event } from '@kotinash/better-events'
+import { ServerConfig } from './server/ServerConfig.mjs'
 import { EventType } from './events/EventType.mjs'
-import { ServerConfig } from './config/Config.mjs'
 import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
 import { Address } from './network/Address.mjs'

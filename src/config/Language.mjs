@@ -1,6 +1,6 @@
+import { ServerConfig } from '../server/ServerConfig.mjs'
 import { LanguageParser } from '@greenfrog/lang-parser'
 import { __dirname } from '../utils/Directory.mjs'
-import { ServerConfig } from './Config.mjs'
 import path from 'path'
 import fs from 'fs'
 
@@ -9,11 +9,6 @@ class Language {
 	 * @type {import('Config').ConfigCache}
 	 */
 	static #cache = []
-
-	/**
-	 * @type {string}
-	 */
-	static #cached_lang_name = ""
 
 	/**
 	 * @param {string} lang 
@@ -45,7 +40,7 @@ class Language {
 	 */
 	static get_key(key, placeholders = []) {
 		const result = LanguageParser.get_key(key, this.#cache, placeholders)
-	
+
 		if (!result) {
 			return `lang error (invalid key): get_key(${key}, ${placeholders})`
 		}

@@ -1,4 +1,4 @@
-import { ServerConfig } from "./src/config/Config.mjs"
+import { ServerConfig } from "./src/server/ServerConfig.mjs"
 import { Language } from "./src/config/Language.mjs"
 import { Address } from "./src/network/Address.mjs"
 import { Logger } from "./src/logger/Logger.mjs"
