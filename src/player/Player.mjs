@@ -37,7 +37,7 @@ class Player extends Entity {
 	/** @type {import("frog-protocol").Connection} */
 	connection
 
-	/** @param {import("../Server.mjs").Server} server */
+	/** @type {import("../Server.mjs").Server} server */
 	server
 
 	/** @type {number} */
@@ -55,6 +55,8 @@ class Player extends Entity {
 		this.name = name
 		this.connection = connection
 		this.server = server
+
+		this.server.players.push(this)
 
 		if (!internal) {
 			Logger.info(Language.get_key("player.connected", [this.name]))

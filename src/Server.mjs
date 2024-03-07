@@ -36,6 +36,9 @@ class Server {
     /** @type {World[]} */
     worlds = []
 
+	/** @type {Player[]} */
+	players = []
+
     /**
      * @param {Address} address 
      * @param {string} [motd=ServerConfig.get("motd")]
