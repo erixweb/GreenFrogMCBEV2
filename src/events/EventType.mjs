@@ -4,6 +4,7 @@ class EventType {
 	static PlayerSetCommandsEnabled = "playerSetCommandsEnabled"
 	static PlayerPlayStatusChange = "playerPlayStatusChange"
 	static PlayerInitialized = "playerInitialized"
+	static PlayerRespawn = "playerRespawn"
 	static PlayerSetFog = "playerSetFog"
 	static PlayerJoin = "playerJoin"
 	static PlayerTick = "playerTick"

@@ -1,12 +1,14 @@
 import { AvailableEntityIdentifiers } from "../network/packets/server/AvailableEntityIdentifiers.mjs"
+import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLevel.mjs"
 import { BiomeDefinitionList } from "../network/packets/server/BiomeDefinitionList.mjs"
+import { SetCommandsEnabled } from "../network/packets/server/SetCommandsEnabled.mjs"
 import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
 import { MovementAuthority } from "../network/packets/types/MovementAuthority.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
+import entities from "../../resources/json/entities.json" with { type: "json" }
 import { EditorWorldType } from "../network/packets/types/EditorWorldType.mjs"
 import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
-import entities from "../../resources/json/entities.json" with { type: "json" }
 import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
@@ -15,7 +17,9 @@ import { PlayStatus } from "../network/packets/server/PlayStatus.mjs"
 import { Difficulty } from "../network/packets/types/Difficulty.mjs"
 import { PermissionLevel } from "../permissions/PermissionLevel.mjs"
 import { StartGame } from "../network/packets/server/StartGame.mjs"
+import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
+import { Respawn } from "../network/packets/server/Respawn.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
 import { ServerConfig } from "../server/ServerConfig.mjs"
 import { Entity, EntityType } from "../entity/Entity.js"
@@ -29,9 +33,6 @@ import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
-import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
-import { SetCommandsEnabled } from "../network/packets/server/SetCommandsEnabled.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -200,6 +201,7 @@ class Player extends Entity {
 
 		this.set_adventure_settings(false, false, false, true, true)
 		this.set_commands_enabled(true)
+		this.respawn(this.location)
 		this.set_fog([])
 	}
 
@@ -311,6 +313,27 @@ class Player extends Entity {
 					const set_commands_enabled = new SetCommandsEnabled()
 					set_commands_enabled.enabled = enabled
 					set_commands_enabled.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {Vec3} position 
+	 */
+	respawn(position) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerRespawn,
+				{
+					player: this
+				},
+				(() => {
+					const respawn = new Respawn()
+					respawn.position = position
+					respawn.runtime_entity_id = String(this.runtime_id)
+					respawn.state = 0 // ???
+					respawn.write(this.connection)
 				})
 			)
 		)
