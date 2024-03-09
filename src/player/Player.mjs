@@ -30,6 +30,7 @@ import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
+import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -197,8 +198,13 @@ class Player extends Entity {
 		Logger.info(Language.get_key("player.spawned", [this.name]))
 
 		this.set_adventure_settings(false, false, false, true, true)
+		this.set_fog([])
 	}
 
+	/**
+	 * Ticks the player.
+	 * Useful for scheduling things without using setInterval()
+	 */
 	#tick() {
 		EventEmitter.emit(
 			new Event(
@@ -261,6 +267,26 @@ class Player extends Entity {
 					update_adventure_settings.no_pvm = no_pvm
 					update_adventure_settings.immutable_world = immutable_world
 					update_adventure_settings.auto_jump = auto_jump
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {string[]} stack 
+	 */
+	set_fog(stack) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerSetFog,
+				{
+					player: this,
+					stack
+				},
+				(() => {
+					const player_fog = new PlayerFog()
+					player_fog.stack = stack
+					player_fog.write(this.connection)
 				})
 			)
 		)

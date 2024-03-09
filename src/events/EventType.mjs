@@ -3,6 +3,7 @@ class EventType {
 	static PlayerSetAdventureSettings = "playerSetAdventureSettings"
 	static PlayerPlayStatusChange = "playerPlayStatusChange"
 	static PlayerInitialized = "playerInitialized"
+	static PlayerSetFog = "playerSetFog"
 	static PlayerJoin = "playerJoin"
 	static PlayerTick = "playerTick"
 
