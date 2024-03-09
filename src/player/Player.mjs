@@ -31,6 +31,7 @@ import { Vec3 } from "vec3"
 import Vec2 from "vec2"
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
+import { SetCommandsEnabled } from "../network/packets/server/SetCommandsEnabled.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -198,6 +199,7 @@ class Player extends Entity {
 		Logger.info(Language.get_key("player.spawned", [this.name]))
 
 		this.set_adventure_settings(false, false, false, true, true)
+		this.set_commands_enabled(true)
 		this.set_fog([])
 	}
 
@@ -287,6 +289,28 @@ class Player extends Entity {
 					const player_fog = new PlayerFog()
 					player_fog.stack = stack
 					player_fog.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * This is only handled client-side!
+	 * 
+	 * @param {boolean} enabled
+	 */
+	set_commands_enabled(enabled) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerSetCommandsEnabled,
+				{
+					player: this,
+					enabled
+				},
+				(() => {
+					const set_commands_enabled = new SetCommandsEnabled()
+					set_commands_enabled.enabled = enabled
+					set_commands_enabled.write(this.connection)
 				})
 			)
 		)
