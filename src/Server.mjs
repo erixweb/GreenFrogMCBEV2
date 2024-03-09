@@ -39,6 +39,9 @@ class Server {
 	/** @type {Player[]} */
 	players = []
 
+    /** @type {number} */
+    current_tick = 0
+
     /**
      * @param {Address} address 
      * @param {string} [motd=ServerConfig.get("motd")]

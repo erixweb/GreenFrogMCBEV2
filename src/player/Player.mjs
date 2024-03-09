@@ -29,6 +29,7 @@ import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
+import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -194,6 +195,8 @@ class Player extends Entity {
 
 	#spawn() {
 		Logger.info(Language.get_key("player.spawned", [this.name]))
+
+		this.set_adventure_settings(false, false, false, true, true)
 	}
 
 	#tick() {
@@ -223,6 +226,41 @@ class Player extends Entity {
 					const play_status_packet = new PlayStatus()
 					play_status_packet.status = status
 					play_status_packet.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {boolean} no_pvm 
+	 * @param {boolean} no_mvp 
+	 * @param {boolean} immutable_world 
+	 * @param {boolean} show_name_tags 
+	 * @param {boolean} auto_jump 
+	 */
+	set_adventure_settings(
+		no_pvm = false,
+		no_mvp = false,
+		immutable_world = false,
+		show_name_tags = false,
+		auto_jump = false
+	) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerSetAdventureSettings,
+				{
+					no_mvp,
+					no_pvm,
+					immutable_world,
+					show_name_tags,
+					auto_jump
+				},
+				(() => {
+					const update_adventure_settings = new UpdateAdventureSettings()
+					update_adventure_settings.no_mvp = no_mvp
+					update_adventure_settings.no_pvm = no_pvm
+					update_adventure_settings.immutable_world = immutable_world
+					update_adventure_settings.auto_jump = auto_jump
 				})
 			)
 		)
