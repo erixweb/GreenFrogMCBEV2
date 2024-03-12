@@ -1,3 +1,4 @@
+import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { ServerConfig } from './server/ServerConfig.mjs'
 import { EventType } from './events/EventType.mjs'
@@ -36,8 +37,8 @@ class Server {
     /** @type {World[]} */
     worlds = []
 
-	/** @type {Player[]} */
-	players = []
+    /** @type {Player[]} */
+    players = []
 
     /** @type {number} */
     current_tick = 0
@@ -64,7 +65,7 @@ class Server {
         this.version = version
         this.max_players = max_players
         this.internal = internal
-        
+
         this.worlds.push(
             new World("world")
         )
@@ -102,7 +103,7 @@ class Server {
     #start_ticking() {
         setInterval(() => {
             this.#tick()
-		}, ServerConfig.get("tick_delay"))
+        }, ServerConfig.get("tick_delay"))
     }
 
     start() {
@@ -144,6 +145,30 @@ class Server {
                 false
             )
         })
+    }
+
+    /**
+     * @param  {...any} params 
+     */
+    broadcast_message(...params) {
+        const [message, type = ChatMessageType.Raw, sender = "", parameters = []] = params
+
+        EventEmitter.emit(
+            new Event(
+                EventType.ServerBroadcast,
+                {
+                    message,
+                    type,
+                    sender,
+                    parameters                    
+                },
+                (() => {
+                    for (const player of this.players) {
+                        player.send_message(message, type, sender, parameters)
+                    }            
+                })
+            )
+        )
     }
 
     shutdown() {

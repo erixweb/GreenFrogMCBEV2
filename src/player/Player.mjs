@@ -33,6 +33,9 @@ import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
+import { Text } from "../network/packets/server/Text.mjs"
+import { ChatMessageType } from "../network/packets/types/ChatMessageType.mjs"
+import { ChatColor } from "../chat/ChatColor.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -203,6 +206,18 @@ class Player extends Entity {
 		this.set_commands_enabled(true)
 		this.respawn(this.location)
 		this.set_fog([])
+		this.#send_join_message()
+	}
+
+	#send_join_message() {
+		if (Boolean(ServerConfig.get("enable_join_messages"))) {
+			this.server.broadcast_message(
+				ChatColor.Yellow + "%multiplayer.player.joined",
+				ChatMessageType.Translation,
+				undefined,
+				[this.name]
+			)
+		}
 	}
 
 	/**
@@ -337,6 +352,24 @@ class Player extends Entity {
 				})
 			)
 		)
+	}
+
+	/**
+	 * @param {string} message 
+	 * @param {string} [type=ChatMessageType.Raw] 
+	 * @param {string} [sender=""] Only if type = ChatMessageType.Chat or ChatMessageType.Translation
+	 * @param {string[]} parameters Only if type = ChatMessageType.Translation or ChatMessageType.Popup or ChatMessageType.JukeboxPopup
+	 */
+	send_message(message, type = ChatMessageType.Raw, sender = "", parameters = []) {
+		const text_packet = new Text()
+		text_packet.type = type
+		text_packet.needs_translation = (type == ChatMessageType.Translation)
+		text_packet.message = message
+		text_packet.source_name = sender
+		text_packet.platform_chat_id = String(this.runtime_id)
+		text_packet.xuid = ""
+		text_packet.parameters = parameters
+		text_packet.write(this.connection)
 	}
 }
 

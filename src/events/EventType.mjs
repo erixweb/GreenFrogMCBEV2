@@ -11,8 +11,9 @@ class EventType {
 
 	static EntityTick = "entityTick"
 
-	static ServerTick = "serverTick"
 	static ServerLog = "serverLog"
+	static ServerTick = "serverTick"
+	static ServerBroadcast = "serverBroadcast"
 }
 
 export { EventType }
