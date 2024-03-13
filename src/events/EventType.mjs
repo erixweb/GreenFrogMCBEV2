@@ -4,6 +4,7 @@ class EventType {
 	static PlayerSetCommandsEnabled = "playerSetCommandsEnabled"
 	static PlayerPlayStatusChange = "playerPlayStatusChange"
 	static PlayerInitialized = "playerInitialized"
+	static PlayerSetTime = "playerSetTime"
 	static PlayerRespawn = "playerRespawn"
 	static PlayerSetFog = "playerSetFog"
 	static PlayerJoin = "playerJoin"
@@ -12,6 +13,7 @@ class EventType {
 	static EntityTick = "entityTick"
 
 	static ServerLog = "serverLog"
+	static ServerChat = "serverChat"
 	static ServerTick = "serverTick"
 	static ServerBroadcast = "serverBroadcast"
 }

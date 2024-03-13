@@ -8,6 +8,7 @@ import { MovementAuthority } from "../network/packets/types/MovementAuthority.mj
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import entities from "../../resources/json/entities.json" with { type: "json" }
 import { EditorWorldType } from "../network/packets/types/EditorWorldType.mjs"
+import { ChatMessageType } from "../network/packets/types/ChatMessageType.mjs"
 import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
 import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
@@ -20,22 +21,22 @@ import { StartGame } from "../network/packets/server/StartGame.mjs"
 import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
 import { Respawn } from "../network/packets/server/Respawn.mjs"
+import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
 import { ServerConfig } from "../server/ServerConfig.mjs"
+import { Text } from "../network/packets/server/Text.mjs"
 import { Entity, EntityType } from "../entity/Entity.js"
 import { Dimension } from "../world/types/Dimension.mjs"
 import { Generator } from "../world/types/Generator.mjs"
 import { EventType } from "../events/EventType.mjs"
 import { Language } from "../config/Language.mjs"
+import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import { Text } from "../network/packets/server/Text.mjs"
-import { ChatMessageType } from "../network/packets/types/ChatMessageType.mjs"
-import { ChatColor } from "../chat/ChatColor.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -49,6 +50,11 @@ class Player extends Entity {
 
 	/** @type {number} */
 	permission_level = PermissionLevel.Member
+
+	/** 
+	 * @type {number} 
+	 */
+	time = 0
 
 	/**
 	 * @param {string} name 
@@ -361,15 +367,48 @@ class Player extends Entity {
 	 * @param {string[]} parameters Only if type = ChatMessageType.Translation or ChatMessageType.Popup or ChatMessageType.JukeboxPopup
 	 */
 	send_message(message, type = ChatMessageType.Raw, sender = "", parameters = []) {
-		const text_packet = new Text()
-		text_packet.type = type
-		text_packet.needs_translation = (type == ChatMessageType.Translation)
-		text_packet.message = message
-		text_packet.source_name = sender
-		text_packet.platform_chat_id = String(this.runtime_id)
-		text_packet.xuid = ""
-		text_packet.parameters = parameters
-		text_packet.write(this.connection)
+		EventEmitter.emit(
+			new Event(
+				EventType.ServerChat,
+				{
+					player: this,
+					message,
+					type,
+					sender,
+					parameters
+				},
+				(() => {
+					const text_packet = new Text()
+					text_packet.type = type
+					text_packet.needs_translation = (type == ChatMessageType.Translation)
+					text_packet.message = message
+					text_packet.source_name = sender
+					text_packet.platform_chat_id = String(this.runtime_id)
+					text_packet.xuid = ""
+					text_packet.parameters = parameters
+					text_packet.write(this.connection)			
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {number} time 
+	 */
+	set_time(time) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerSetTime,
+				{
+					time
+				},
+				(() => {
+					const time_packet = new SetTime()
+					time_packet.time = time
+					time_packet.write(this.connection)
+				})
+			)
+		)
 	}
 }
 

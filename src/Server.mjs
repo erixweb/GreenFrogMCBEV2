@@ -171,6 +171,15 @@ class Server {
         )
     }
 
+    /**
+     * @param {number} time 
+     */
+    set_time(time) {
+        for (const player of this.players) {
+            player.set_time(time)
+        }
+    }
+
     shutdown() {
         this._server?.close()
     }
