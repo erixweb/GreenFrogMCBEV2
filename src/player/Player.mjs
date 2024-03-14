@@ -33,6 +33,7 @@ import { Language } from "../config/Language.mjs"
 import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
+import { Toast } from "../toast/Toast.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
@@ -211,8 +212,15 @@ class Player extends Entity {
 		this.set_adventure_settings(false, false, false, true, true)
 		this.set_commands_enabled(true)
 		this.respawn(this.location)
-		this.set_fog([])
 		this.#send_join_message()
+		this.set_fog([])
+
+		setInterval(() => {
+			new Toast(
+				"greenfrog v2",
+				"supports toast messages now"
+			).send(this)
+		}, 2000)
 	}
 
 	#send_join_message() {
@@ -386,7 +394,7 @@ class Player extends Entity {
 					text_packet.platform_chat_id = String(this.runtime_id)
 					text_packet.xuid = ""
 					text_packet.parameters = parameters
-					text_packet.write(this.connection)			
+					text_packet.write(this.connection)
 				})
 			)
 		)
@@ -409,6 +417,15 @@ class Player extends Entity {
 				})
 			)
 		)
+	}
+
+	/**
+	 * @param {Toast} toast 
+	 */
+	send_toast(toast) {
+		const new_toast = new Toast()
+		new_toast.from(toast)
+		new_toast.send(this)
 	}
 }
 

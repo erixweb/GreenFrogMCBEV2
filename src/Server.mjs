@@ -8,6 +8,8 @@ import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
 import { Player } from './player/Player.mjs'
 import { World } from './world/World.mjs'
+import { Debug } from './utils/Debug.mjs'
+import { Flat } from './world/generators/Flat.mjs'
 
 class Server {
     /** @type {Address} */
@@ -33,6 +35,11 @@ class Server {
 
     /** @type {boolean} */
     internal = false
+
+    /** @type {Generator[]} */
+    generators = [
+        new Flat()
+    ]
 
     /** @type {World[]} */
     worlds = []
@@ -135,6 +142,20 @@ class Server {
             const user_data = connection.getUserData()
             const player = new Player(user_data.displayName, connection, this)
 
+            if (Debug.is_debug()) {
+                connection._queue = connection.queue
+
+                /**
+                 * @param {string} name 
+                 * @param {object} params 
+                 */
+                connection.queue = (name, params) => {
+                    Logger.debug(`Sent to client ${player.name}: ${name} - ${JSON.stringify(params)}`)
+
+                    connection._queue(name, params)
+                }
+            }
+
             EventEmitter.emit(
                 new Event(
                     EventType.PlayerJoin,
@@ -160,12 +181,12 @@ class Server {
                     message,
                     type,
                     sender,
-                    parameters                    
+                    parameters
                 },
                 (() => {
                     for (const player of this.players) {
                         player.send_message(message, type, sender, parameters)
-                    }            
+                    }
                 })
             )
         )

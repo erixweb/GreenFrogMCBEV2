@@ -1,5 +1,6 @@
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { EventType } from '../events/EventType.mjs'
+import { Debug } from '../utils/Debug.mjs'
 import chalk from 'chalk'
 
 class LogLevel {
@@ -55,7 +56,9 @@ class Logger {
 	 * @param {string} message 
 	 */
 	static debug(message) {
-		this.log(LogLevel.Debug, message)
+		if (Debug.is_debug()) {
+			this.log(LogLevel.Debug, message)
+		}
 	}
 
 	/**

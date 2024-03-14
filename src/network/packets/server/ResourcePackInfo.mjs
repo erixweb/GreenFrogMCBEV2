@@ -8,6 +8,9 @@ class ResourcePackInfo extends Packet {
 	must_accept
 
 	/** @type {boolean | undefined} */
+	has_addons
+	
+	/** @type {boolean | undefined} */
 	has_scripts
 
 	/** @type {any[] | undefined} */
@@ -31,6 +34,7 @@ class ResourcePackInfo extends Packet {
 
 		connection.queue(this.name, {
 			must_accept: this.must_accept,
+			has_addons: this.has_addons,
 			has_scripts: this.has_scripts,
 			behaviour_packs: this.behavior_packs,
 			texture_packs: this.texture_packs,

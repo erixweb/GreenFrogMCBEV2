@@ -12,10 +12,13 @@ class EventType {
 
 	static EntityTick = "entityTick"
 
-	static ServerLog = "serverLog"
+	static WorldGenerate = "worldGenerate"
+
+	static ServerBroadcast = "serverBroadcast"
+	static ServerToast = "serverToast"
 	static ServerChat = "serverChat"
 	static ServerTick = "serverTick"
-	static ServerBroadcast = "serverBroadcast"
+	static ServerLog = "serverLog"
 }
 
 export { EventType }
