@@ -214,13 +214,6 @@ class Player extends Entity {
 		this.respawn(this.location)
 		this.#send_join_message()
 		this.set_fog([])
-
-		setInterval(() => {
-			new Toast(
-				"greenfrog v2",
-				"supports toast messages now"
-			).send(this)
-		}, 2000)
 	}
 
 	#send_join_message() {
