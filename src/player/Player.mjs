@@ -1,6 +1,7 @@
 import { AvailableEntityIdentifiers } from "../network/packets/server/AvailableEntityIdentifiers.mjs"
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLevel.mjs"
+import { NetworkStackLatency } from "../network/packets/server/NetworkStackLatency.mjs"
 import { BiomeDefinitionList } from "../network/packets/server/BiomeDefinitionList.mjs"
 import { SetCommandsEnabled } from "../network/packets/server/SetCommandsEnabled.mjs"
 import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
@@ -52,10 +53,11 @@ class Player extends Entity {
 	/** @type {number} */
 	permission_level = PermissionLevel.Member
 
-	/** 
-	 * @type {number} 
-	 */
+	/** @type {number} */
 	time = 0
+
+	/** @type {boolean} */
+	offline = false
 
 	/**
 	 * @param {string} name 
@@ -73,7 +75,7 @@ class Player extends Entity {
 		this.server.players.push(this)
 
 		if (!internal) {
-			Logger.info(Language.get_key("player.connected", [this.name]))
+			Logger.info(Language.get_key("player.connected", [this.name, this.get_ip()]))
 
 			this.#send_packets()
 			this.send_play_status("player_spawn")
@@ -419,6 +421,91 @@ class Player extends Entity {
 		const new_toast = new Toast()
 		new_toast.from(toast)
 		new_toast.send(this)
+	}
+
+	/**
+	 * @param {boolean} secure Should GreenFrog do extra checks to prevent ping spoofing? 
+	 * @returns {Promise<number>}
+	 */
+	async get_latency(secure = true) {
+		let ms_without_reply = 0
+
+		const interval = setInterval(() => {
+			ms_without_reply++
+		}, 1)
+
+		const promise = new Promise((resolve, reject) => {
+			EventEmitter.on(EventType.PacketReceived, (event) => {
+				if (event.connection.profile.xuid == this.connection.profile.xuid) {
+					if (!(event.packet.data.name == new NetworkStackLatency().name) && secure) {
+						reject("Packets are out of order!")
+					}
+				}
+			})
+
+			EventEmitter.once(EventType.PacketNetworkStackLatencyResponse, (event) => {
+				if (event.connection.profile.xuid == this.connection.profile.xuid) {
+					clearInterval(interval)
+
+					resolve(ms_without_reply)
+				}
+			})
+		})
+
+		if (this.offline) {
+			clearInterval(interval)
+
+			return -1;
+		}
+
+		const network_stack_latency = new NetworkStackLatency()
+		network_stack_latency.timestamp = this.server.current_tick
+		network_stack_latency.needs_response = true	
+		network_stack_latency.write(this.connection)
+
+		const latency = await promise
+
+		return latency
+	}
+
+	/**
+	 * @param {string} [reason="You were disconnected"] 
+	 */
+	kick(reason = "You were disconnected") {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerKick,
+				{
+					player: this,
+					reason
+				},
+				(() => {
+					this.connection.disconnect(reason)
+				})
+			)
+		)
+	}
+
+	on_leave() {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerLeave,
+				{
+					player: this
+				}
+			)
+		)
+
+		this.offline = true
+
+		this.kick("Player disconnected")
+	}
+
+	/**
+	 * @returns {string} 
+	 */
+	get_ip() {
+		return this.connection.connection.address
 	}
 }
 

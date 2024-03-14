@@ -32,7 +32,7 @@ class World {
 	#generate() {
 		Logger.info(Language.get_key("world.generating", [this.name]))
 
-		this.chunks.push(this.generator.generate() || new Buffer(65565).fill(0))
+		this.chunks.push(this.generator.generate() || Buffer.alloc(65565).fill(0))
 
 		Logger.info(Language.get_key("world.generated"))
 	}

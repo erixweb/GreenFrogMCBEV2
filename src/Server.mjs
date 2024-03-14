@@ -1,6 +1,8 @@
+import { NetworkStackLatency } from './network/packets/client/NetworkStackLatency.mjs'
 import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { ServerConfig } from './server/ServerConfig.mjs'
+import { Packet } from './network/packets/Packet.mjs'
 import { EventType } from './events/EventType.mjs'
 import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
@@ -9,7 +11,6 @@ import { Logger } from './logger/Logger.mjs'
 import { Player } from './player/Player.mjs'
 import { World } from './world/World.mjs'
 import { Debug } from './utils/Debug.mjs'
-import { Flat } from './world/generators/Flat.mjs'
 
 class Server {
     /** @type {Address} */
@@ -36,10 +37,10 @@ class Server {
     /** @type {boolean} */
     internal = false
 
-    /** @type {Generator[]} */
-    generators = [
-        new Flat()
-    ]
+    // /** @type {Generator[]} */
+    // generators = [
+    //     new Flat()
+    // ]
 
     /** @type {World[]} */
     worlds = []
@@ -49,6 +50,11 @@ class Server {
 
     /** @type {number} */
     current_tick = 0
+
+    /** @type {Packet[]} */
+    #packet_handlers = [
+        new NetworkStackLatency()
+    ]
 
     /**
      * @param {Address} address 
@@ -165,6 +171,28 @@ class Server {
                 ),
                 false
             )
+
+            connection.on("close", () => {
+                player.on_leave()
+            })
+
+            connection.on("packet", (packet) => {
+                for (const handler of this.#packet_handlers) {
+                    if (packet.data.name == handler.name) {
+                        EventEmitter.emit(
+                            new Event(
+                                EventType.PacketReceived,
+                                {
+                                    connection,
+                                    packet
+                                }
+                            )
+                        )
+
+                        handler.read(connection, packet)
+                    }
+                }
+            })
         })
     }
 
