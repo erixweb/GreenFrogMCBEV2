@@ -2,6 +2,7 @@ import { NetworkStackLatency } from './network/packets/client/NetworkStackLatenc
 import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { ServerConfig } from './server/ServerConfig.mjs'
+import { Text } from './network/packets/client/Text.mjs'
 import { Packet } from './network/packets/Packet.mjs'
 import { EventType } from './events/EventType.mjs'
 import { bedrock } from './utils/ProtocolFix.mjs'
@@ -53,7 +54,8 @@ class Server {
 
     /** @type {Packet[]} */
     #packet_handlers = [
-        new NetworkStackLatency()
+        new NetworkStackLatency(),
+        new Text()
     ]
 
     /**
@@ -189,7 +191,7 @@ class Server {
                             )
                         )
 
-                        handler.read(connection, packet)
+                        handler.read(player, packet)
                     }
                 }
             })
@@ -212,6 +214,8 @@ class Server {
                     parameters
                 },
                 (() => {
+                    Logger.info(message)
+
                     for (const player of this.players) {
                         player.send_message(message, type, sender, parameters)
                     }

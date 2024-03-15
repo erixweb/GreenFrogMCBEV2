@@ -8,4 +8,8 @@ debug.enabled=Debugging is enabled, this may cause lag while sending large packe
 
 player.connected=Player "%0" connected (IP: %1)
 
+chat.format=<%0> %1
+
 player.spawned=Player "%0" spawned
+
+vanilla.multiplayer.player.joined=%multiplayer.player.joined

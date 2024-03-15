@@ -8,6 +8,7 @@ class EventType {
 	static PlayerRespawn = "playerRespawn"
 	static PlayerSetFog = "playerSetFog"
 	static PlayerLeave = "playerLeave"
+	static PlayerChat = "playerChat"
 	static PlayerKick = "playerKick"
 	static PlayerJoin = "playerJoin"
 	static PlayerTick = "playerTick"

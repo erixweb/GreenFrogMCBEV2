@@ -1,3 +1,5 @@
+import { Player } from "../../player/Player.mjs"
+
 class Packet {
 	/** @type {string | undefined} */
 	name
@@ -10,10 +12,10 @@ class Packet {
 	}
 
 	/**
-	 * @param {import("frog-protocol").Connection} connection 
+	 * @param {Player} player
 	 * @param {any} packet
 	 */
-	read(connection, packet) {
+	read(player, packet) {
 		throw new Error("This should be implemented by sub-classes")
 	}
 }

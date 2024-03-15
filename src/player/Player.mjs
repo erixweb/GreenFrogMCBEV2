@@ -221,7 +221,7 @@ class Player extends Entity {
 	#send_join_message() {
 		if (Boolean(ServerConfig.get("enable_join_messages"))) {
 			this.server.broadcast_message(
-				ChatColor.Yellow + "%multiplayer.player.joined",
+				ChatColor.Yellow + Language.get_key("vanilla.multiplayer.player.joined"),
 				ChatMessageType.Translation,
 				undefined,
 				[this.name]
