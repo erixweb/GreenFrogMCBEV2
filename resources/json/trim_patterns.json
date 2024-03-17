@@ -1,0 +1,66 @@
+[
+	{
+		"item_name": "minecraft:ward_armor_trim_smithing_template",
+		"pattern": "ward"
+	},
+	{
+		"item_name": "minecraft:sentry_armor_trim_smithing_template",
+		"pattern": "sentry"
+	},
+	{
+		"item_name": "minecraft:snout_armor_trim_smithing_template",
+		"pattern": "snout"
+	},
+	{
+		"item_name": "minecraft:dune_armor_trim_smithing_template",
+		"pattern": "dune"
+	},
+	{
+		"item_name": "minecraft:spire_armor_trim_smithing_template",
+		"pattern": "spire"
+	},
+	{
+		"item_name": "minecraft:tide_armor_trim_smithing_template",
+		"pattern": "tide"
+	},
+	{
+		"item_name": "minecraft:wild_armor_trim_smithing_template",
+		"pattern": "wild"
+	},
+	{
+		"item_name": "minecraft:rib_armor_trim_smithing_template",
+		"pattern": "rib"
+	},
+	{
+		"item_name": "minecraft:coast_armor_trim_smithing_template",
+		"pattern": "coast"
+	},
+	{
+		"item_name": "minecraft:shaper_armor_trim_smithing_template",
+		"pattern": "shaper"
+	},
+	{
+		"item_name": "minecraft:eye_armor_trim_smithing_template",
+		"pattern": "eye"
+	},
+	{
+		"item_name": "minecraft:vex_armor_trim_smithing_template",
+		"pattern": "vex"
+	},
+	{
+		"item_name": "minecraft:silence_armor_trim_smithing_template",
+		"pattern": "silence"
+	},
+	{
+		"item_name": "minecraft:wayfinder_armor_trim_smithing_template",
+		"pattern": "wayfinder"
+	},
+	{
+		"item_name": "minecraft:raiser_armor_trim_smithing_template",
+		"pattern": "raiser"
+	},
+	{
+		"item_name": "minecraft:host_armor_trim_smithing_template",
+		"pattern": "host"
+	}
+]

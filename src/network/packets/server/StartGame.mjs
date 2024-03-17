@@ -247,18 +247,18 @@ class StartGame extends Packet {
 	 * @param {import("frog-protocol").Connection} connection 
 	 */
 	write(connection) {
-		let gamerules_sanitized = this.gamerules || []
+		let gamerules_converted = this.gamerules || []
 
 		if (this.gamerules[0] instanceof Gamerule) {
-			gamerules_sanitized = this.gamerules.map(gamerule => gamerule.toJSON())
+			gamerules_converted = this.gamerules.map(gamerule => gamerule.toJSON())
 		}
 
-		const expirements_sanitized = this.experiments.map(expirement => expirement.toJSON())
+		const expirements_converted = this.experiments.map(expirement => expirement.toJSON())
 
-		let itemstates_sanitized = this.itemstates || []
+		let itemstates_converted = this.itemstates || []
 
 		if (this.gamerules[0] instanceof ItemState) {
-			itemstates_sanitized = this.itemstates.map(itemstate => itemstate.toJSON())
+			itemstates_converted = this.itemstates.map(itemstate => itemstate.toJSON())
 		}
 
 		connection.queue(this.name, {
@@ -292,8 +292,8 @@ class StartGame extends Packet {
 			platform_broadcast_mode: this.platform_broadcast_mode,
 			enable_commands: this.enable_commands,
 			is_texturepacks_required: this.is_texturepacks_required,
-			gamerules: gamerules_sanitized,
-			experiments: expirements_sanitized,
+			gamerules: gamerules_converted,
+			experiments: expirements_converted,
 			experiments_previously_used: this.experiments_previously_used,
 			bonus_chest: this.bonus_chest,
 			map_enabled: this.map_enabled,
@@ -326,7 +326,7 @@ class StartGame extends Packet {
 			current_tick: this.current_tick,
 			enchantment_seed: this.enchantment_seed,
 			block_properties: this.block_properties,
-			itemstates: itemstates_sanitized,
+			itemstates: itemstates_converted,
 			multiplayer_correlation_id: this.multiplayer_correlation_id,
 			server_authoritative_inventory: this.server_authoritative_inventory,
 			engine: this.engine,

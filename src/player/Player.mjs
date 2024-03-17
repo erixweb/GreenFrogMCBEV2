@@ -1,6 +1,9 @@
 import { AvailableEntityIdentifiers } from "../network/packets/server/AvailableEntityIdentifiers.mjs"
 import creative_content_data from "../../resources/json/creative_content.json" with { type: "json" }
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
+import trim_materials from "../../resources/json/trim_materials.json" with { type: "json" }
+import { UpdatePlayerGameType } from "../network/packets/server/UpdatePlayerGameType.js"
+import trim_patterns from "../../resources/json/trim_patterns.json" with { type: "json" }
 import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLevel.mjs"
 import { NetworkStackLatency } from "../network/packets/server/NetworkStackLatency.mjs"
 import { BiomeDefinitionList } from "../network/packets/server/BiomeDefinitionList.mjs"
@@ -23,6 +26,7 @@ import { PermissionLevel } from "../permissions/PermissionLevel.mjs"
 import { StartGame } from "../network/packets/server/StartGame.mjs"
 import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
+import { TrimData } from "../network/packets/server/TrimData.mjs"
 import { Respawn } from "../network/packets/server/Respawn.mjs"
 import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
@@ -60,6 +64,9 @@ class Player extends Entity {
 
 	/** @type {boolean} */
 	offline = false
+
+	/** @type {string} */
+	gamemode = Gamemode.Creative;
 
 	/**
 	 * @param {string} name 
@@ -125,8 +132,13 @@ class Player extends Entity {
 		biome_definition_list.write(this.connection)
 		
 		const creative_content = new CreativeContent()
-		creative_content.items = creative_content_data.items
+		creative_content.items = creative_content_data
 		creative_content.write(this.connection)
+
+		const trim_data = new TrimData()
+		trim_data.materials = trim_materials
+		trim_data.patterns = trim_patterns
+		trim_data.write(this.connection)
 
 		const default_world = this.server.worlds[0]
 
@@ -506,6 +518,29 @@ class Player extends Entity {
 		this.offline = true
 
 		this.kick("Player disconnected")
+	}
+
+	/**
+	 * @param {string} gamemode
+	 */
+	set_gamemode(gamemode) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerGamemodeChange,
+				{
+					player: this,
+					gamemode
+				},
+				(() => {
+					this.gamemode = gamemode
+
+					const update_player_game_type = new UpdatePlayerGameType()
+					update_player_game_type.gamemode = gamemode
+					update_player_game_type.player_unique_id = String(this.runtime_id)
+					update_player_game_type.write(this.connection)
+				})
+			)
+		)
 	}
 
 	/**

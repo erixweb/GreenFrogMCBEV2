@@ -28,30 +28,30 @@ class ResourcePackStack extends Packet {
 	 * @param {import("frog-protocol").Connection} connection 
 	 */
 	write(connection) {
-		const experiments_sanitizied = []
+		const experiments_converted = []
 
 		for (const experiment of this.experiments) {
-			experiments_sanitizied.push(experiment.toJSON())
+			experiments_converted.push(experiment.toJSON())
 		}
 
-		const behaviour_packs_sanitized = []
+		const behaviour_packs_converted = []
 
 		for (const pack of this.behavior_packs) {
-			behaviour_packs_sanitized.push(pack.toJSON())
+			behaviour_packs_converted.push(pack.toJSON())
 		}
 
-		const resource_packs_sanitized = []
+		const resource_packs_converted = []
 
 		for (const pack of this.resource_packs) {
-			resource_packs_sanitized.push(pack.toJSON())
+			resource_packs_converted.push(pack.toJSON())
 		}
 
 		connection.queue(this.name, {
 			must_accept: this.must_accept,
-			behavior_packs: behaviour_packs_sanitized,
-			resource_packs: resource_packs_sanitized,
+			behavior_packs: behaviour_packs_converted,
+			resource_packs: resource_packs_converted,
 			game_version: this.game_version,
-			experiments: experiments_sanitizied,
+			experiments: experiments_converted,
 			experiments_previously_used: this.experiments_previously_used,
 		})
 	}

@@ -1,9 +1,9 @@
 import { __dirname } from "../utils/Directory.mjs"
+import { Language } from "../config/Language.mjs"
 import { Logger } from "../logger/Logger.mjs"
 import Plugin from "./Plugin.cjs"
 import path from "path"
 import fs from "fs"
-import { Language } from "../config/Language.mjs"
 
 class PluginLoader {
 	/** @type {Plugin[]} */

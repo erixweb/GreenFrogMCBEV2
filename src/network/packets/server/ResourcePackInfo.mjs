@@ -26,10 +26,10 @@ class ResourcePackInfo extends Packet {
 	 * @param {import("frog-protocol").Connection} connection 
 	 */
 	write(connection) {
-		const resource_pack_links_sanitized = []
+		const resource_pack_links_converted = []
 
 		for (const link of this.resource_pack_links) {
-			resource_pack_links_sanitized.push(link.toJSON())
+			resource_pack_links_converted.push(link.toJSON())
 		}
 
 		connection.queue(this.name, {
@@ -38,7 +38,7 @@ class ResourcePackInfo extends Packet {
 			has_scripts: this.has_scripts,
 			behaviour_packs: this.behavior_packs,
 			texture_packs: this.texture_packs,
-			resource_pack_links: resource_pack_links_sanitized,
+			resource_pack_links: resource_pack_links_converted,
 		})
 	}
 }

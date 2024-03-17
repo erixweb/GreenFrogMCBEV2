@@ -54,7 +54,7 @@ class Server {
     /** @type {number} */
     current_tick = 0
 
-    /** @type {Gamemode} */
+    /** @type {string} */
     gamemode = Gamemode.Fallback
 
     /** @type {Packet[]} */
@@ -189,7 +189,7 @@ class Server {
 
             connection.on("packet", (packet) => {
                 for (const handler of this.#packet_handlers) {
-                    if (packet.data.name == handler.name) {
+                    if (packet.data.name === handler.name) {
                         EventEmitter.emit(
                             new Event(
                                 EventType.PacketReceived,

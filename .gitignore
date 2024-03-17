@@ -5,3 +5,6 @@ bun.lockb
 
 # Config files
 server.properties
+
+# Intellij
+.idea/

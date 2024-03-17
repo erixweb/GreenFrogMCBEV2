@@ -3,6 +3,7 @@ class EventType {
 	static PlayerSetAdventureSettings = "playerSetAdventureSettings"
 	static PlayerSetCommandsEnabled = "playerSetCommandsEnabled"
 	static PlayerPlayStatusChange = "playerPlayStatusChange"
+	static PlayerGamemodeChange = "playerGamemodeChange"
 	static PlayerInitialized = "playerInitialized"
 	static PlayerSetTime = "playerSetTime"
 	static PlayerRespawn = "playerRespawn"
@@ -15,7 +16,6 @@ class EventType {
 
 	static EntityTick = "entityTick"
 
-	static PacketHandled = "packetHandled"
 	static PacketReceived = "packetReceived"
 	static PacketNetworkStackLatencyResponse = "packetNetworkStackLatencyResponse"
 
