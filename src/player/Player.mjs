@@ -1,4 +1,5 @@
 import { AvailableEntityIdentifiers } from "../network/packets/server/AvailableEntityIdentifiers.mjs"
+import creative_content_data from "../../resources/json/creative_content.json" with { type: "json" }
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLevel.mjs"
 import { NetworkStackLatency } from "../network/packets/server/NetworkStackLatency.mjs"
@@ -8,6 +9,7 @@ import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.m
 import { MovementAuthority } from "../network/packets/types/MovementAuthority.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import entities from "../../resources/json/entities.json" with { type: "json" }
+import { CreativeContent } from "../network/packets/server/CreativeContent.mjs"
 import { EditorWorldType } from "../network/packets/types/EditorWorldType.mjs"
 import { ChatMessageType } from "../network/packets/types/ChatMessageType.mjs"
 import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
@@ -58,6 +60,9 @@ class Player extends Entity {
 
 	/** @type {boolean} */
 	offline = false
+
+	/** @type {boolean} */
+	is_inventory_open = false
 
 	/**
 	 * @param {string} name 
@@ -121,6 +126,10 @@ class Player extends Entity {
 		const biome_definition_list = new BiomeDefinitionList()
 		biome_definition_list.nbt = biomes.nbt
 		biome_definition_list.write(this.connection)
+		
+		const creative_content = new CreativeContent()
+		creative_content.items = creative_content_data.items
+		creative_content.write(this.connection)
 
 		const default_world = this.server.worlds[0]
 

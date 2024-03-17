@@ -7,6 +7,7 @@ import { Packet } from './network/packets/Packet.mjs'
 import { EventType } from './events/EventType.mjs'
 import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
+import { Gamemode } from './player/Gamemode.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
 import { Player } from './player/Player.mjs'
@@ -51,6 +52,9 @@ class Server {
 
     /** @type {number} */
     current_tick = 0
+
+    /** @type {Gamemode} */
+    gamemode = Gamemode.Fallback
 
     /** @type {Packet[]} */
     #packet_handlers = [

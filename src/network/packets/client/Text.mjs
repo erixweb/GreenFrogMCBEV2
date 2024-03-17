@@ -12,7 +12,7 @@ class Text extends Packet {
 	 * @param {object} packet
 	 */
 	read(player, packet) {
-		const message = packet.data.params.message
+		const { message } = packet.data.params
 
 		if (!message || message.length > 256) return
 
