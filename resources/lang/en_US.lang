@@ -12,4 +12,13 @@ chat.format=<%0> %1
 
 player.spawned=Player "%0" spawned
 
+plugin.loading=Loading plugin "%0"
+plugin.loaded=Loaded plugin "%0"
+
+plugin.unloading=Unloading plugin "%0"
+plugin.unloaded=Unloaded plugin "%0"
+
+plugin.loading.failed=Error while loading plugin "%0": %1
+plugin.unloading.failed=Error while unloading plugin "%0": %1
+
 vanilla.multiplayer.player.joined=%multiplayer.player.joined

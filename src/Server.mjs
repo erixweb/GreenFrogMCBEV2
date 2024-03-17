@@ -1,6 +1,7 @@
 import { NetworkStackLatency } from './network/packets/client/NetworkStackLatency.mjs'
 import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
+import { PluginLoader } from './plugins/PluginLoader.mjs'
 import { ServerConfig } from './server/ServerConfig.mjs'
 import { Text } from './network/packets/client/Text.mjs'
 import { Packet } from './network/packets/Packet.mjs'
@@ -61,6 +62,8 @@ class Server {
         new NetworkStackLatency(),
         new Text()
     ]
+
+    plugin_loader = new PluginLoader()
 
     /**
      * @param {Address} address 
@@ -127,6 +130,8 @@ class Server {
 
     start() {
         if (!this.internal) this.listen()
+
+        this.plugin_loader.load()
 
         this.#start_ticking()
     }

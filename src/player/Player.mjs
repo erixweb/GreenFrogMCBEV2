@@ -61,9 +61,6 @@ class Player extends Entity {
 	/** @type {boolean} */
 	offline = false
 
-	/** @type {boolean} */
-	is_inventory_open = false
-
 	/**
 	 * @param {string} name 
 	 * @param {import("frog-protocol").Connection} connection
@@ -434,6 +431,7 @@ class Player extends Entity {
 
 	/**
 	 * @param {boolean} secure Should GreenFrog do extra checks to prevent ping spoofing? 
+	 * @throws {Error} If the player is offline
 	 * @returns {Promise<number>}
 	 */
 	async get_latency(secure = true) {
@@ -464,7 +462,7 @@ class Player extends Entity {
 		if (this.offline) {
 			clearInterval(interval)
 
-			return -1;
+			throw new Error("Player is offline")
 		}
 
 		const network_stack_latency = new NetworkStackLatency()
