@@ -1,4 +1,5 @@
 import { AvailableEntityIdentifiers } from "../network/packets/server/AvailableEntityIdentifiers.mjs"
+import { NetworkChunkPublisherUpdate } from "../network/packets/server/NetworkChunkPublisherUpdate.mjs"
 import creative_content_data from "../../resources/json/creative_content.json" with { type: "json" }
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 import trim_materials from "../../resources/json/trim_materials.json" with { type: "json" }
@@ -49,7 +50,7 @@ import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import {NetworkChunkPublisherUpdate} from "../network/packets/server/NetworkChunkPublisherUpdate.mjs";
+import {SetDifficulty} from "../network/packets/server/SetDifficulty.mjs";
 
 class Player extends Entity {
 	/** @type {string} */
@@ -99,12 +100,13 @@ class Player extends Entity {
 			this.#send_packets()
 			this.#send_chunks()
 			this.send_play_status("player_spawn")
+			this.set_difficulty(this.server.difficulty)
 			this.#spawn()
 		}
 
 		setInterval(() => {
 			this.#tick()
-		}, ServerConfig.get("tick_delay"))
+		}, ServerConfig.get_number("tick_delay"))
 	}
 
 	#send_packets() {
@@ -155,20 +157,18 @@ class Player extends Entity {
 		trim_data.patterns = trim_patterns
 		trim_data.write(this.connection)
 
-		const default_world = this.server.worlds[0]
-
 		this.location = new Vec3(
-			default_world.get_spawn_position().x,
+			this.world.get_spawn_position().x,
 			100,
-			default_world.get_spawn_position().z,
+			this.world.get_spawn_position().z
 		)
 
 		const start_game = new StartGame()
 		start_game.entity_id = this.runtime_id
-		start_game.gamemode = Gamemode.Creative
+		start_game.gamemode = this.server.gamemode
 		start_game.player_position = this.location
 		start_game.rotation = new Vec2(0, 0)
-		start_game.seed = default_world.seed
+		start_game.seed = this.world.seed
 		start_game.biome_type = 0
 		start_game.biome_name = Biome.Plains
 		start_game.generator = Generator.Infinite
@@ -218,8 +218,8 @@ class Player extends Entity {
 		start_game.experimental_gameplay_override = false
 		start_game.chat_restriction_level = ChatRestrictionLevel.None
 		start_game.disable_player_interactions = false
-		start_game.level_id = default_world.name
-		start_game.world_name = default_world.name
+		start_game.level_id = this.world.name
+		start_game.world_name = this.world.name
 		start_game.premium_world_template_id = UUID.DEFAULT_UUID
 		start_game.is_trial = false
 		start_game.movement_authority = MovementAuthority.Server
@@ -242,31 +242,23 @@ class Player extends Entity {
 	}
 
 	#send_chunks() {
+		if (!this.server.enable_world) return
+
 		const render_distance = this.world.chunk_radius;
 
 		this.set_chunk_radius(render_distance)
 
 		for (let x = this.location.x - render_distance; x <= this.location.x + render_distance; x++) {
 			for (let z = this.location.z - render_distance; z <= this.location.z + render_distance; z++) {
-				let level_chunk = new LevelChunk()
+				const level_chunk = new LevelChunk()
 				level_chunk.x = x
 				level_chunk.z = z
 				level_chunk.sub_chunk_count = 1
 				level_chunk.cache_enabled = false
 				level_chunk.payload = this.world.generate_chunk()
 				level_chunk.write(this.connection)
-
-				level_chunk = undefined
 			}
 		}
-
-		setInterval(() => {
-			const network_chunk_publisher_update = new NetworkChunkPublisherUpdate()
-			network_chunk_publisher_update.coordinates = this.location
-			network_chunk_publisher_update.radius = render_distance
-			network_chunk_publisher_update.saved_chunks = []
-			network_chunk_publisher_update.write(this.connection)
-		}, 1000)
 	}
 
 	#spawn() {
@@ -306,7 +298,16 @@ class Player extends Entity {
 				EventType.PlayerTick,
 				{
 					player: this
-				}
+				},
+				(() => {
+					if (this.server.enable_world) {
+						const network_chunk_publisher_update = new NetworkChunkPublisherUpdate()
+						network_chunk_publisher_update.coordinates = this.location
+						network_chunk_publisher_update.radius = this.world.chunk_radius
+						network_chunk_publisher_update.saved_chunks = []
+						network_chunk_publisher_update.write(this.connection)
+					}
+				})
 			),
 			false
 		)
@@ -504,15 +505,15 @@ class Player extends Entity {
 
 		const promise = new Promise((resolve, reject) => {
 			EventEmitter.on(EventType.PacketReceived, (event) => {
-				if (event.connection.profile.xuid == this.connection.profile.xuid) {
-					if (!(event.packet.data.name == new NetworkStackLatency().name) && secure) {
+				if (event.connection.profile.xuid === this.connection.profile.xuid) {
+					if (!(event.packet.data.name === new NetworkStackLatency().name) && secure) {
 						reject("Packets are out of order!")
 					}
 				}
 			})
 
 			EventEmitter.once(EventType.PacketNetworkStackLatencyResponse, (event) => {
-				if (event.connection.profile.xuid == this.connection.profile.xuid) {
+				if (event.connection.profile.xuid === this.connection.profile.xuid) {
 					clearInterval(interval)
 
 					resolve(ms_without_reply)
@@ -598,7 +599,7 @@ class Player extends Entity {
 	set_chunk_radius(radius) {
 		EventEmitter.emit(
 			new Event(
-				EventType.PlayerPlayStatusChange,
+				EventType.PlayerChunkRadiusUpdate,
 				{
 					player: this,
 					radius
@@ -613,7 +614,27 @@ class Player extends Entity {
 	}
 
 	/**
-	 * @returns {string} 
+	 * @param {number} difficulty
+	 */
+	set_difficulty(difficulty) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerSetDifficulty,
+				{
+					player: this,
+					difficulty
+				},
+				(() => {
+					const set_difficulty = new SetDifficulty()
+					set_difficulty.difficulty = difficulty
+					set_difficulty.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * @returns {InetAddress}
 	 */
 	get_ip() {
 		return this.connection.connection.address

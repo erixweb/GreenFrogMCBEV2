@@ -20,6 +20,13 @@ class Address {
 		this.host = host
 		this.port = port
 	}
+
+	/**
+	 * @returns {string}
+	 */
+	toString() {
+		return `${this.host}:${this.port}`
+	}
 }
 
 export { Address }

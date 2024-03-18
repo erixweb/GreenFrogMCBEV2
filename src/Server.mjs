@@ -11,7 +11,6 @@ import { Flat } from "./world/generators/Flat.mjs"
 import { EventType } from './events/EventType.mjs'
 import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
-import { Gamemode } from './player/Gamemode.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
 import { Player } from './player/Player.mjs'
@@ -30,9 +29,6 @@ class Server {
 
     /** @type {string} */
     version
-
-    /** @type {Logger} */
-    logger = new Logger()
 
     /** @type {import("frog-protocol").Server | undefined} */
     _server
@@ -64,8 +60,14 @@ class Server {
     /** @type {number} */
     current_tick = 0
 
-    /** @type {string} */
-    gamemode = Gamemode.Fallback
+    /** @type {string | undefined} */
+    gamemode
+
+    /** @type {number | undefined} */
+    difficulty
+
+    /** @type {boolean} */
+    enable_world = true
 
     /** @type {Packet[]} */
     #packet_handlers = [
@@ -77,27 +79,42 @@ class Server {
     /** @type {PluginLoader} */
     plugin_loader = new PluginLoader()
 
+    /** @type {string} */
+    raknet_backend = "raknet-native"
+
     /**
-     * @param {Address} address 
+     * @param {Address} address
      * @param {string} [motd=ServerConfig.get("motd")]
      * @param {string} [name=ServerConfig.get("server_name")]
      * @param {string} [version=ServerConfig.get("version")]
-     * @param {number} [max_players=ServerConfig.get("max_players")] 
-     * @param {boolean} [internal=false] 
+     * @param {string} [gamemode=ServerConfig.get("gamemode")]
+     * @param {number} [difficulty=ServerConfig.get_number("difficulty")]
+     * @param {number} [max_players=ServerConfig.get_number("max_players")]
+     * @param {boolean} [enable_world=ServerConfig.get_boolean("enable_world")]
+     * @param {string} [raknet_backend=ServerConfig.get("raknet_backend")]
+     * @param {boolean} [internal=false]
      */
     constructor(
         address,
         motd = ServerConfig.get("motd"),
         name = ServerConfig.get("server_name"),
         version = ServerConfig.get("version"),
-        max_players = Number(ServerConfig.get("max_players")),
+        gamemode = ServerConfig.get("gamemode"),
+        difficulty = ServerConfig.get_number("difficulty"),
+        max_players = ServerConfig.get_number("max_players"),
+        enable_world= ServerConfig.get_boolean("enable_world"),
+        raknet_backend = ServerConfig.get("raknet_backend"),
         internal = false
     ) {
         this.address = address
         this.motd = motd
         this.name = name
         this.version = version
+        this.gamemode = gamemode
+        this.difficulty = difficulty
         this.max_players = max_players
+        this.enable_world = enable_world
+        this.raknet_backend = raknet_backend
         this.internal = internal
     }
 
@@ -107,6 +124,7 @@ class Server {
         this._server = bedrock.createServer({
             host: this.address.host,
             port: Number(this.address.port),
+            raknetBackend: this.raknet_backend,
             maxPlayers: this.max_players,
             version: this.version,
             motd: {
@@ -128,12 +146,15 @@ class Server {
                 )
             )
         })
+
+        Logger.info(Language.get_key("server.listening", [this.name, this.address.toString()]))
+        Logger.info(Language.get_key("server.started", [this.name]))
     }
 
     #start_ticking() {
         setInterval(() => {
             this.#tick()
-        }, ServerConfig.get("tick_delay"))
+        }, ServerConfig.get_number("tick_delay"))
     }
 
     start() {
@@ -167,6 +188,16 @@ class Server {
             const user_data = connection.getUserData()
             const player = new Player(user_data.displayName, connection, this)
 
+            EventEmitter.emit(
+                new Event(
+                    EventType.PlayerJoin,
+                    {
+                        player
+                    }
+                ),
+                false
+            )
+
             if (Debug.is_debug()) {
                 connection._queue = connection.queue
 
@@ -180,16 +211,6 @@ class Server {
                     connection._queue(name, params)
                 }
             }
-
-            EventEmitter.emit(
-                new Event(
-                    EventType.PlayerJoin,
-                    {
-                        player
-                    }
-                ),
-                false
-            )
 
             connection.on("close", () => {
                 player.on_leave()
@@ -216,11 +237,12 @@ class Server {
     }
 
     /**
-     * @param  {...any} params 
+     * @param {string} message
+     * @param {string} [type=ChatMessageType.Raw]
+     * @param {string} [sender=""]
+     * @param {any[]} [parameters=[]]
      */
-    broadcast_message(...params) {
-        const [message, type = ChatMessageType.Raw, sender = "", parameters = []] = params
-
+    broadcast_message(message, type = ChatMessageType.Raw, sender = "", parameters = []) {
         EventEmitter.emit(
             new Event(
                 EventType.ServerBroadcast,
@@ -250,8 +272,20 @@ class Server {
         }
     }
 
-    shutdown() {
-        this._server?.close()
+    /**
+     * @param {number} difficulty
+     */
+    set_difficulty(difficulty) {
+        for (const player of this.players) {
+            player.set_difficulty(difficulty)
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async shutdown() {
+        await this._server?.close()
     }
 }
 

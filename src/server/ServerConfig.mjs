@@ -45,10 +45,27 @@ class ServerConfig extends Config {
     }
 
 	/**
-	 * @param {string} key 
+	 * @param {string} key
+     * @return {string}
 	 */
     static get(key) {
         return this.cache[key]
+    }
+
+    /**
+     * @param {string} key
+     * @return {boolean}
+     */
+    static get_boolean(key) {
+        return Boolean(this.get(key))
+    }
+
+    /**
+     * @param {string} key
+     * @return {number}
+     */
+    static get_number(key) {
+        return Number(this.get(key))
     }
 }
 

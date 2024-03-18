@@ -1,5 +1,9 @@
 server.loading=Loading...
+
 server.starting=Starting server "%0"
+server.started=Started server "%0"
+
+server.listening=Server "%0" is now listening on address "%1"
 
 debug.enabled=Debugging is enabled, this may cause lag while sending large packets
 

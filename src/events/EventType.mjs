@@ -6,6 +6,7 @@ class EventType {
 	static PlayerChunkRadiusUpdate = "playerChunkRadiusUpdate"
 	static PlayerPlayStatusChange = "playerPlayStatusChange"
 	static PlayerGamemodeChange = "playerGamemodeChange"
+	static PlayerSetDifficulty = "playerSetDifficulty"
 	static PlayerInitialized = "playerInitialized"
 	static PlayerSetTime = "playerSetTime"
 	static PlayerRespawn = "playerRespawn"
