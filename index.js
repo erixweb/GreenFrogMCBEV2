@@ -5,7 +5,7 @@ import { Logger } from "./src/logger/Logger.mjs"
 import { Debug } from "./src/utils/Debug.mjs"
 import { Server } from "./src/Server.mjs"
 
-if (parseFloat(process.versions.node) < 14) {
+if (parseFloat(process.versions.node) < 20) {
     throw new Error("Your Node.JS version is too old, please update to the latest one from https://nodejs.org/")
 }
 
