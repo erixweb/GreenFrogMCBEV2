@@ -11,28 +11,6 @@ class Generator {
 	generate_chunk() {
 		return Buffer.alloc(0)
 	}
-
-	/**
-	 * @returns {Buffer | undefined} 
-	 */
-	generate() {
-		/** @type {Buffer | undefined} */
-		let result;
-
-		EventEmitter.emit(
-			new Event(
-				EventType.WorldGenerate,
-				{
-					generator: this
-				},
-				(() => {
-					result = this.generate_chunk()
-				})
-			)
-		)
-
-		return result
-	}
 }
 
 export { Generator }

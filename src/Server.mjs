@@ -1,10 +1,13 @@
 import { NetworkStackLatency } from './network/packets/client/NetworkStackLatency.mjs'
+import { RequestChunkRadius } from './network/packets/client/RequestChunkRadius.mjs'
 import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { PluginLoader } from './plugins/PluginLoader.mjs'
 import { ServerConfig } from './server/ServerConfig.mjs'
 import { Text } from './network/packets/client/Text.mjs'
+import { Seed } from './network/packets/types/Seed.mjs'
 import { Packet } from './network/packets/Packet.mjs'
+import { Flat } from "./world/generators/Flat.mjs"
 import { EventType } from './events/EventType.mjs'
 import { bedrock } from './utils/ProtocolFix.mjs'
 import { Language } from './config/Language.mjs'
@@ -40,13 +43,20 @@ class Server {
     /** @type {boolean} */
     internal = false
 
-    // /** @type {Generator[]} */
-    // generators = [
-    //     new Flat()
-    // ]
+    /** @type {Generator[]} */
+    generators = [
+        new Flat()
+    ]
 
     /** @type {World[]} */
-    worlds = []
+    worlds = [
+        new World(
+            "world",
+            this.generators[0],
+            new Seed(0, 0),
+            16
+        )
+    ]
 
     /** @type {Player[]} */
     players = []
@@ -60,9 +70,11 @@ class Server {
     /** @type {Packet[]} */
     #packet_handlers = [
         new NetworkStackLatency(),
+        new RequestChunkRadius(),
         new Text()
     ]
 
+    /** @type {PluginLoader} */
     plugin_loader = new PluginLoader()
 
     /**
@@ -87,10 +99,6 @@ class Server {
         this.version = version
         this.max_players = max_players
         this.internal = internal
-
-        this.worlds.push(
-            new World("world")
-        )
     }
 
     listen() {

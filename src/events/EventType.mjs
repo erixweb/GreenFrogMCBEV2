@@ -1,7 +1,9 @@
 class EventType {
 	static PlayerConnectionInitialized = "playerConnectionInitialized"
 	static PlayerSetAdventureSettings = "playerSetAdventureSettings"
+	static PlayerRequestChunkRadius = "playerRequestChunkRadius"
 	static PlayerSetCommandsEnabled = "playerSetCommandsEnabled"
+	static PlayerChunkRadiusUpdate = "playerChunkRadiusUpdate"
 	static PlayerPlayStatusChange = "playerPlayStatusChange"
 	static PlayerGamemodeChange = "playerGamemodeChange"
 	static PlayerInitialized = "playerInitialized"

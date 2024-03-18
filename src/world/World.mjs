@@ -1,8 +1,6 @@
-import { Seed } from "../network/packets/types/Seed.mjs"
-import { Generator } from "./generators/Generator.mjs"
-import { Language } from "../config/Language.mjs"
-import { Logger } from "../logger/Logger.mjs"
-import { Vec3 } from "vec3"
+import {Seed} from "../network/packets/types/Seed.mjs"
+import {Generator} from "./generators/Generator.mjs"
+import {Vec3} from "vec3"
 
 class World {
 	/** @type {string} */
@@ -14,27 +12,27 @@ class World {
 	/** @type {Generator} */
 	generator = new Generator()
 
-	/** @type {Buffer[]} */
-	chunks = []
+	/** @type {number} */
+	chunk_radius = 16
 
 	/**
-	 * @param {string} name 
-	 * @param {Generator} generator
+	 * @param {string} [name]
+	 * @param {Generator} [generator]
+	 * @param {Seed} [seed]
+	 * @param {number} [chunk_radius=16]
 	 */
-	constructor(name = "world", generator = new Generator(), seed = new Seed()) {
+	constructor(name = "world", generator = new Generator(), seed = new Seed(), chunk_radius = 16) {
 		this.name = name
 		this.seed = seed
 		this.generator = generator
-
-		this.#generate()
+		this.chunk_radius = chunk_radius
 	}
 
-	#generate() {
-		Logger.info(Language.get_key("world.generating", [this.name]))
-
-		this.chunks.push(this.generator.generate() || Buffer.alloc(65565).fill(0))
-
-		Logger.info(Language.get_key("world.generated"))
+	/**
+	 * @returns {Buffer}
+	 */
+	generate_chunk() {
+		return this.generator.generate_chunk()
 	}
 
 	/** 
@@ -48,13 +46,11 @@ class World {
 		 */
 		const get_spawn_offset = (original) => original + Math.floor(Math.random() * 10)
 
-		const result = new Vec3(
+		return new Vec3(
 			get_spawn_offset(0),
 			10,
 			get_spawn_offset(0)
 		)
-
-		return result
 	}
 }
 

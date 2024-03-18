@@ -1,9 +1,6 @@
 server.loading=Loading...
 server.starting=Starting server "%0"
 
-world.generating=Generating world "%0"...
-world.generated=World successfully generated
-
 debug.enabled=Debugging is enabled, this may cause lag while sending large packets
 
 player.connected=Player "%0" connected (IP: %1)

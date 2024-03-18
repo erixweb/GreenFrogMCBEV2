@@ -8,7 +8,9 @@ import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLe
 import { NetworkStackLatency } from "../network/packets/server/NetworkStackLatency.mjs"
 import { BiomeDefinitionList } from "../network/packets/server/BiomeDefinitionList.mjs"
 import { SetCommandsEnabled } from "../network/packets/server/SetCommandsEnabled.mjs"
+import { ChunkRadiusUpdate } from "../network/packets/server/ChunkRadiusUpdate.mjs"
 import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
+import { ClientCacheStatus } from "../network/packets/server/ClientCacheStatus.mjs"
 import { MovementAuthority } from "../network/packets/types/MovementAuthority.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import entities from "../../resources/json/entities.json" with { type: "json" }
@@ -21,6 +23,7 @@ import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
 import { PropertyData } from "../network/packets/types/PropertyData.mjs"
 import { PlayStatus } from "../network/packets/server/PlayStatus.mjs"
+import { LevelChunk } from "../network/packets/server/LevelChunk.mjs"
 import { Difficulty } from "../network/packets/types/Difficulty.mjs"
 import { PermissionLevel } from "../permissions/PermissionLevel.mjs"
 import { StartGame } from "../network/packets/server/StartGame.mjs"
@@ -41,10 +44,12 @@ import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
 import { Toast } from "../toast/Toast.mjs"
+import { World } from "../world/World.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
+import {NetworkChunkPublisherUpdate} from "../network/packets/server/NetworkChunkPublisherUpdate.mjs";
 
 class Player extends Entity {
 	/** @type {string} */
@@ -59,14 +64,17 @@ class Player extends Entity {
 	/** @type {number} */
 	permission_level = PermissionLevel.Member
 
-	/** @type {number} */
-	time = 0
-
 	/** @type {boolean} */
 	offline = false
 
 	/** @type {string} */
 	gamemode = Gamemode.Creative;
+
+	/** @type {World | undefined} */
+	world
+
+	/** @type {number} */
+	render_distance = 0
 
 	/**
 	 * @param {string} name 
@@ -81,12 +89,15 @@ class Player extends Entity {
 		this.connection = connection
 		this.server = server
 
+		this.world = server.worlds[0]
+
 		this.server.players.push(this)
 
 		if (!internal) {
 			Logger.info(Language.get_key("player.connected", [this.name, this.get_ip()]))
 
 			this.#send_packets()
+			this.#send_chunks()
 			this.send_play_status("player_spawn")
 			this.#spawn()
 		}
@@ -130,10 +141,14 @@ class Player extends Entity {
 		const biome_definition_list = new BiomeDefinitionList()
 		biome_definition_list.nbt = biomes.nbt
 		biome_definition_list.write(this.connection)
-		
+
 		const creative_content = new CreativeContent()
 		creative_content.items = creative_content_data
 		creative_content.write(this.connection)
+
+		const client_cache_status = new ClientCacheStatus()
+		client_cache_status.enabled = true
+		client_cache_status.write(this.connection)
 
 		const trim_data = new TrimData()
 		trim_data.materials = trim_materials
@@ -226,10 +241,44 @@ class Player extends Entity {
 		start_game.write(this.connection)
 	}
 
+	#send_chunks() {
+		const render_distance = this.world.chunk_radius;
+
+		this.set_chunk_radius(render_distance)
+
+		for (let x = this.location.x - render_distance; x <= this.location.x + render_distance; x++) {
+			for (let z = this.location.z - render_distance; z <= this.location.z + render_distance; z++) {
+				let level_chunk = new LevelChunk()
+				level_chunk.x = x
+				level_chunk.z = z
+				level_chunk.sub_chunk_count = 1
+				level_chunk.cache_enabled = false
+				level_chunk.payload = this.world.generate_chunk()
+				level_chunk.write(this.connection)
+
+				level_chunk = undefined
+			}
+		}
+
+		setInterval(() => {
+			const network_chunk_publisher_update = new NetworkChunkPublisherUpdate()
+			network_chunk_publisher_update.coordinates = this.location
+			network_chunk_publisher_update.radius = render_distance
+			network_chunk_publisher_update.saved_chunks = []
+			network_chunk_publisher_update.write(this.connection)
+		}, 1000)
+	}
+
 	#spawn() {
 		Logger.info(Language.get_key("player.spawned", [this.name]))
 
-		this.set_adventure_settings(false, false, false, true, true)
+		this.set_adventure_settings(
+			false,
+			false,
+			false,
+			true,
+			true
+		)
 		this.set_commands_enabled(true)
 		this.respawn(this.location)
 		this.#send_join_message()
@@ -479,7 +528,7 @@ class Player extends Entity {
 
 		const network_stack_latency = new NetworkStackLatency()
 		network_stack_latency.timestamp = this.server.current_tick
-		network_stack_latency.needs_response = true	
+		network_stack_latency.needs_response = true
 		network_stack_latency.write(this.connection)
 
 		const latency = await promise
@@ -538,6 +587,26 @@ class Player extends Entity {
 					update_player_game_type.gamemode = gamemode
 					update_player_game_type.player_unique_id = String(this.runtime_id)
 					update_player_game_type.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {number} radius 
+	 */
+	set_chunk_radius(radius) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerPlayStatusChange,
+				{
+					player: this,
+					radius
+				},
+				(() => {
+					const chunk_radius_update = new ChunkRadiusUpdate()
+					chunk_radius_update.chunk_radius = radius
+					chunk_radius_update.write(this.connection)
 				})
 			)
 		)
