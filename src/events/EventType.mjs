@@ -8,6 +8,8 @@ class EventType {
 	static PlayerGamemodeChange = "playerGamemodeChange"
 	static PlayerSetDifficulty = "playerSetDifficulty"
 	static PlayerInitialized = "playerInitialized"
+	static PlayerTransfer = "playerTransfer"
+	static PlayerCreated = "playerCreated"
 	static PlayerSetTime = "playerSetTime"
 	static PlayerRespawn = "playerRespawn"
 	static PlayerSetFog = "playerSetFog"

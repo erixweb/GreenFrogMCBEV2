@@ -102,7 +102,7 @@ class Server {
         gamemode = ServerConfig.get("gamemode"),
         difficulty = ServerConfig.get_number("difficulty"),
         max_players = ServerConfig.get_number("max_players"),
-        enable_world= ServerConfig.get_boolean("enable_world"),
+        enable_world = ServerConfig.get_boolean("enable_world"),
         raknet_backend = ServerConfig.get("raknet_backend"),
         internal = false
     ) {

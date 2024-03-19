@@ -44,13 +44,14 @@ import { Language } from "../config/Language.mjs"
 import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
-import { Toast } from "../toast/Toast.mjs"
+import { Toast } from "./Toast.mjs"
 import { World } from "../world/World.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
 import {SetDifficulty} from "../network/packets/server/SetDifficulty.mjs";
+import {Transfer} from "../network/packets/server/Transfer.mjs";
 
 class Player extends Entity {
 	/** @type {string} */
@@ -94,6 +95,18 @@ class Player extends Entity {
 
 		this.server.players.push(this)
 
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerCreated,
+				{
+					name,
+					connection,
+					server,
+					internal
+				}
+			)
+		)
+
 		if (!internal) {
 			Logger.info(Language.get_key("player.connected", [this.name, this.get_ip()]))
 
@@ -101,10 +114,15 @@ class Player extends Entity {
 			this.#send_chunks()
 			this.send_play_status("player_spawn")
 			this.set_difficulty(this.server.difficulty)
+			this.set_commands_enabled(true)
 			this.#spawn()
 		}
 
-		setInterval(() => {
+		const ticking_interval = setInterval(() => {
+			if (this.offline) {
+				clearInterval(ticking_interval)
+			}
+
 			this.#tick()
 		}, ServerConfig.get_number("tick_delay"))
 	}
@@ -158,9 +176,9 @@ class Player extends Entity {
 		trim_data.write(this.connection)
 
 		this.location = new Vec3(
-			this.world.get_spawn_position().x,
+			this.world?.get_spawn_position().x,
 			100,
-			this.world.get_spawn_position().z
+			this.world?.get_spawn_position().z
 		)
 
 		const start_game = new StartGame()
@@ -303,7 +321,7 @@ class Player extends Entity {
 					if (this.server.enable_world) {
 						const network_chunk_publisher_update = new NetworkChunkPublisherUpdate()
 						network_chunk_publisher_update.coordinates = this.location
-						network_chunk_publisher_update.radius = this.world.chunk_radius
+						network_chunk_publisher_update.radius = this.world.chunk_radius * 16
 						network_chunk_publisher_update.saved_chunks = []
 						network_chunk_publisher_update.write(this.connection)
 					}
@@ -424,7 +442,7 @@ class Player extends Entity {
 					const respawn = new Respawn()
 					respawn.position = position
 					respawn.runtime_entity_id = String(this.runtime_id)
-					respawn.state = 0 // ???
+					respawn.state = 0
 					respawn.write(this.connection)
 				})
 			)
@@ -489,6 +507,29 @@ class Player extends Entity {
 		const new_toast = new Toast()
 		new_toast.from(toast)
 		new_toast.send(this)
+	}
+
+	/**
+	 * @param {string} address
+	 * @param {number} port
+	 */
+	transfer(address, port) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerTransfer,
+				{
+					player: this,
+					address,
+					port
+				},
+				(() => {
+					const transfer = new Transfer()
+					transfer.server_address = address
+					transfer.port = port
+					transfer.write(this.connection)
+				})
+			)
+		)
 	}
 
 	/**
