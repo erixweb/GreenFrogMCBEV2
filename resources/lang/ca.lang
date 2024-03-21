@@ -1,0 +1,25 @@
+server.loading=Carregant...
+
+server.starting=Iniciant el servidor "%0"
+server.started=Servidor iniciat "%0"
+
+server.listening=Servidor "%0" està escoltant en l'adreça "%1"
+
+debug.enabled=La depuració està activada, això pot causar lag quan s'enviïn grans paquets
+
+player.connected=Jugador "%0" s'ha connectat (IP: %1)
+
+chat.format=<%0> %1
+
+player.spawned=Jugador "%0" ha aparegut
+
+plugin.loading=Carregant plugin "%0"
+plugin.loaded=Plugin carregat "%0"
+
+plugin.unloading=Descarregant plugin "%0"
+plugin.unloaded=Descarregant plugin "%0"
+
+plugin.loading.failed=Error mentre es carregava el plugin "%0": %1
+plugin.unloading.failed=Error mentre es descarregava el plugin "%0": %1
+
+vanilla.multiplayer.player.joined=%multiplayer.player.joined
