@@ -13,6 +13,8 @@ class FormRequest extends Packet {
     /** @type {FormButton | undefined} */
     buttons
 
+    actions = []
+
     /** @type {string | undefined} */
     title
 
@@ -32,12 +34,12 @@ class FormRequest extends Packet {
      * @param {import("frog-protocol").Connection} connection
      */
     write(connection) {
-        connection.queue(this.name, {
+        console.log(this.name, {
             form_id: this.id,
             data: JSON.stringify({
-                content: this.content,
-                title: this.title,
                 type: this.type,
+                title: this.title,
+                content: this.actions,
                 ...(this.type === FormType.ModalForm
                         ? { button1: this.button1, button2: this.button2 }
                         : { buttons: this.buttons }

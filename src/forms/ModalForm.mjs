@@ -3,8 +3,9 @@ import { FormButton } from "./types/FormButton.mjs"
 import { FormManager } from "./FormManager.mjs"
 import { FormType } from "./types/FormType.mjs"
 import { Player } from "../player/Player.mjs"
+import { Form } from "./Form.mjs"
 
-class ModalForm {
+class ModalForm extends Form {
     /** @type {string} */
     title = ""
 
@@ -36,6 +37,8 @@ class ModalForm {
      * @param {number} id
      */
     constructor(title, text, button1, button2, on_send = () => {}, id = FormManager.LAST_FORM_ID++) {
+        super()
+
         this.title = title
         this.text = text
         this.button1 = button1

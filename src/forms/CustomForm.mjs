@@ -4,16 +4,14 @@ import { FormButton } from "./types/FormButton.mjs"
 import { FormManager } from "./FormManager.mjs"
 import { FormType } from "./types/FormType.mjs"
 import { Player } from "../player/Player.mjs"
+import { Form } from "./Form.mjs"
 
-class CustomForm {
+class CustomForm extends Form {
 	/** @type {string} */
 	title = ""
 
 	/** @type {any[]} */
 	actions = []
-
-	/** @type {FormButton[]} */
-	buttons = []
 
 	/** @type {number} */
 	id = FormManager.LAST_FORM_ID
@@ -27,15 +25,15 @@ class CustomForm {
 
 	/**
 	 * @param {string} title 
-	 * @param {FormActionType[]} actions 
-	 * @param {FormButton[]} buttons 
-	 * @param {number} id 
-	 * @param {function} on_send 
+	 * @param {FormActionType[]} [actions] 
+	 * @param {number} [id] 
+	 * @param {function} [on_send]
 	 */
-	constructor(title, actions, buttons, id, on_send) {
+	constructor(title, actions = [], on_send = () => {}, id = FormManager.LAST_FORM_ID++) {
+		super()
+
 		this.title = title
 		this.actions = actions
-		this.buttons = buttons
 		this.id = id
 		this.on_send = on_send
 	}
@@ -90,12 +88,11 @@ class CustomForm {
 	/**
 	 * @returns {FormRequest}
 	 */
-	get_constructed_packet() {	
+	get_constructed_packet() {
 		const form_request = new FormRequest()
 		form_request.id = this.id
-		form_request.title = this.title
-		form_request.content = this.actions
-		form_request.buttons = this.buttons
+		form_request.title = "aaa"
+		form_request.actions = this.actions
 		form_request.type = FormType.CustomForm
 		return form_request
 	}
@@ -112,4 +109,4 @@ class CustomForm {
 	}
 }
 
-module.exports = CustomForm
+export { CustomForm }

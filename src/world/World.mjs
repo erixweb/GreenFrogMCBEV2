@@ -1,6 +1,6 @@
-import {Seed} from "../network/packets/types/Seed.mjs"
-import {Generator} from "./generators/Generator.mjs"
-import {Vec3} from "vec3"
+import { Seed } from "../network/packets/types/Seed.mjs"
+import { Generator } from "./generators/Generator.mjs"
+import { Vec3 } from "vec3"
 
 class World {
 	/** @type {string} */
@@ -26,6 +26,13 @@ class World {
 		this.seed = seed
 		this.generator = generator
 		this.chunk_radius = chunk_radius
+	}
+
+	/**
+	 * @returns {number} 
+	 */
+	get_subchunk_count() {
+		return 9
 	}
 
 	/**

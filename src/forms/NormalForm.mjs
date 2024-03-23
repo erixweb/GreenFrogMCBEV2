@@ -3,8 +3,9 @@ import { FormButton } from "./types/FormButton.mjs"
 import { FormManager } from "./FormManager.mjs"
 import { FormType } from "./types/FormType.mjs"
 import { Player } from "../player/Player.mjs"
+import { Form } from "./Form.mjs"
 
-class NormalForm {
+class NormalForm extends Form {
     /** @type {string} */
     title = ""
 
@@ -32,6 +33,8 @@ class NormalForm {
      * @param {number} id
      */
     constructor(title, content, buttons = [], on_send = () => {}, id = FormManager.LAST_FORM_ID++) {
+        super()
+
         this.title = title
         this.content = content
         this.buttons = buttons
