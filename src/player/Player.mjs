@@ -22,6 +22,7 @@ import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
 import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
+	import {SetDifficulty} from "../network/packets/server/SetDifficulty.mjs"
 import { PropertyData } from "../network/packets/types/PropertyData.mjs"
 import { PlayStatus } from "../network/packets/server/PlayStatus.mjs"
 import { LevelChunk } from "../network/packets/server/LevelChunk.mjs"
@@ -31,6 +32,7 @@ import { StartGame } from "../network/packets/server/StartGame.mjs"
 import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
 import { TrimData } from "../network/packets/server/TrimData.mjs"
+import { Transfer } from "../network/packets/server/Transfer.mjs"
 import { Respawn } from "../network/packets/server/Respawn.mjs"
 import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
@@ -44,14 +46,14 @@ import { Language } from "../config/Language.mjs"
 import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
-import { Toast } from "./Toast.mjs"
 import { World } from "../world/World.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
+import { Form } from "../forms/Form.mjs"
+import { Toast } from "./Toast.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import {SetDifficulty} from "../network/packets/server/SetDifficulty.mjs";
-import {Transfer} from "../network/packets/server/Transfer.mjs";
+import {FormButton} from "../forms/types/FormButton.mjs";
 
 class Player extends Entity {
 	/** @type {string} */
@@ -116,6 +118,26 @@ class Player extends Entity {
 			this.set_difficulty(this.server.difficulty)
 			this.set_commands_enabled(true)
 			this.#spawn()
+
+			EventEmitter.on(
+				EventType.PlayerChat,
+				(() => {
+					setTimeout(() => {
+						const form = new Form(
+							"form",
+							"greenfrog v2 supports forms now",
+							[
+								new FormButton("ok"),
+								new FormButton("ok2")
+							],
+							(player, form) => {
+								console.log(player)
+							}
+						)
+						form.send(this)
+					}, 1000)
+				})
+			)
 		}
 
 		const ticking_interval = setInterval(() => {
