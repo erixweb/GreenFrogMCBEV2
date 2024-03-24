@@ -22,6 +22,7 @@ import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
 import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
+import { SetDifficulty } from "../network/packets/server/SetDifficulty.mjs"
 import { PropertyData } from "../network/packets/types/PropertyData.mjs"
 import { PlayStatus } from "../network/packets/server/PlayStatus.mjs"
 import { LevelChunk } from "../network/packets/server/LevelChunk.mjs"
@@ -31,27 +32,28 @@ import { StartGame } from "../network/packets/server/StartGame.mjs"
 import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
 import { TrimData } from "../network/packets/server/TrimData.mjs"
+import { Transfer } from "../network/packets/server/Transfer.mjs"
 import { Respawn } from "../network/packets/server/Respawn.mjs"
 import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
+import { FormButton } from "../forms/types/FormButton.mjs"
 import { ServerConfig } from "../server/ServerConfig.mjs"
 import { Text } from "../network/packets/server/Text.mjs"
 import { Entity, EntityType } from "../entity/Entity.js"
 import { Dimension } from "../world/types/Dimension.mjs"
 import { Generator } from "../world/types/Generator.mjs"
+import { CustomForm } from "../forms/CustomForm.mjs"
 import { EventType } from "../events/EventType.mjs"
 import { Language } from "../config/Language.mjs"
 import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
-import { Toast } from "./Toast.mjs"
 import { World } from "../world/World.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
+import { Toast } from "./Toast.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import {SetDifficulty} from "../network/packets/server/SetDifficulty.mjs";
-import {Transfer} from "../network/packets/server/Transfer.mjs";
 
 class Player extends Entity {
 	/** @type {string} */
@@ -271,9 +273,9 @@ class Player extends Entity {
 				const level_chunk = new LevelChunk()
 				level_chunk.x = x
 				level_chunk.z = z
-				level_chunk.sub_chunk_count = 1
+				level_chunk.sub_chunk_count = this.world?.get_subchunk_count()
 				level_chunk.cache_enabled = false
-				level_chunk.payload = this.world.generate_chunk()
+				level_chunk.payload = this.world?.generate_chunk()
 				level_chunk.write(this.connection)
 			}
 		}
