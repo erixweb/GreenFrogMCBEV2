@@ -34,12 +34,12 @@ class FormRequest extends Packet {
      * @param {import("frog-protocol").Connection} connection
      */
     write(connection) {
-        console.log(this.name, {
+        connection.queue(this.name, {
             form_id: this.id,
             data: JSON.stringify({
-                type: this.type,
                 title: this.title,
                 content: this.actions,
+                type: this.type,
                 ...(this.type === FormType.ModalForm
                         ? { button1: this.button1, button2: this.button2 }
                         : { buttons: this.buttons }

@@ -118,23 +118,6 @@ class Player extends Entity {
 			this.set_difficulty(this.server.difficulty)
 			this.set_commands_enabled(true)
 			this.#spawn()
-
-			EventEmitter.on(
-				EventType.PlayerChat,
-				(() => {
-					setTimeout(() => {
-						const form = new CustomForm(
-							"form",
-							[],
-							(player, form) => {
-								console.log(player)
-							}
-						)
-						form.add_text("a");
-						form.send(this)
-					}, 3000)
-				})
-			)
 		}
 
 		const ticking_interval = setInterval(() => {
