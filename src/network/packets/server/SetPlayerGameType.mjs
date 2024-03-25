@@ -1,12 +1,12 @@
 import { Packet } from "../Packet.mjs"
 
-class UpdatePlayerGameType extends Packet {
-    name = "update_player_game_type"
+class SetPlayerGameType extends Packet {
+    name = "set_player_game_type"
 
     /** @type {string | undefined} */
     gamemode
 
-    /** @type {string | undefined} */
+    /** @type {number | undefined} */
     player_unique_id
 
     /**
@@ -20,4 +20,4 @@ class UpdatePlayerGameType extends Packet {
     }
 }
 
-export { UpdatePlayerGameType }
+export { SetPlayerGameType }

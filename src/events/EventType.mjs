@@ -1,4 +1,5 @@
 class EventType {
+	static PlayerMovementValidationFail = "playerMovementValidationFail"
 	static PlayerConnectionInitialized = "playerConnectionInitialized"
 	static PlayerSetAdventureSettings = "playerSetAdventureSettings"
 	static PlayerRequestChunkRadius = "playerRequestChunkRadius"
@@ -8,12 +9,14 @@ class EventType {
 	static PlayerGamemodeChange = "playerGamemodeChange"
 	static PlayerSetDifficulty = "playerSetDifficulty"
 	static PlayerInitialized = "playerInitialized"
+	static PlayerTeleport = "playerTeleport"
 	static PlayerTransfer = "playerTransfer"
 	static PlayerCreated = "playerCreated"
 	static PlayerSetTime = "playerSetTime"
 	static PlayerRespawn = "playerRespawn"
 	static PlayerSetFog = "playerSetFog"
 	static PlayerLeave = "playerLeave"
+	static PlayerMove = "playerMove"
 	static PlayerChat = "playerChat"
 	static PlayerKick = "playerKick"
 	static PlayerJoin = "playerJoin"
@@ -23,9 +26,6 @@ class EventType {
 
 	static PacketReceived = "packetReceived"
 	static PacketNetworkStackLatencyResponse = "packetNetworkStackLatencyResponse"
-
-	static WorldGenerate = "worldGenerate"
-
 	static ServerBroadcast = "serverBroadcast"
 	static ServerToast = "serverToast"
 	static ServerChat = "serverChat"

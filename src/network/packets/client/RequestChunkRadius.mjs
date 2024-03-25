@@ -4,7 +4,7 @@ import { Player } from "../../../player/Player.mjs"
 import { Packet } from "../Packet.mjs"
 
 class RequestChunkRadius extends Packet {
-	name = "chunk_radius_update"
+	name = "request_chunk_radius"
 
 	/**
      * @param {Player} player
@@ -23,6 +23,8 @@ class RequestChunkRadius extends Packet {
 				},
 				(() => {
 					player.render_distance = chunk_radius
+
+					player.set_chunk_radius(player.world.chunk_radius)
 				})
 			)
 		)

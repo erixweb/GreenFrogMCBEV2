@@ -3,7 +3,6 @@ import { NetworkChunkPublisherUpdate } from "../network/packets/server/NetworkCh
 import creative_content_data from "../../resources/json/creative_content.json" with { type: "json" }
 import { UpdateAdventureSettings } from "../network/packets/server/UpdateAdventureSettings.mjs"
 import trim_materials from "../../resources/json/trim_materials.json" with { type: "json" }
-import { UpdatePlayerGameType } from "../network/packets/server/UpdatePlayerGameType.js"
 import trim_patterns from "../../resources/json/trim_patterns.json" with { type: "json" }
 import { ChatRestrictionLevel } from "../network/packets/types/ChatRestrictionLevel.mjs"
 import { NetworkStackLatency } from "../network/packets/server/NetworkStackLatency.mjs"
@@ -11,14 +10,17 @@ import { BiomeDefinitionList } from "../network/packets/server/BiomeDefinitionLi
 import { SetCommandsEnabled } from "../network/packets/server/SetCommandsEnabled.mjs"
 import { ChunkRadiusUpdate } from "../network/packets/server/ChunkRadiusUpdate.mjs"
 import { ResourcePackStack } from "../network/packets/server/ResourcePackStack.mjs"
+import { SetPlayerGameType } from "../network/packets/server/SetPlayerGameType.mjs"
 import { ClientCacheStatus } from "../network/packets/server/ClientCacheStatus.mjs"
 import { MovementAuthority } from "../network/packets/types/MovementAuthority.mjs"
 import { ResourcePackInfo } from "../network/packets/server/ResourcePackInfo.mjs"
 import entities from "../../resources/json/entities.json" with { type: "json" }
 import { CreativeContent } from "../network/packets/server/CreativeContent.mjs"
+import { MoveEntityDelta } from "../network/packets/server/MoveEntityDelta.mjs"
 import { EditorWorldType } from "../network/packets/types/EditorWorldType.mjs"
 import { ChatMessageType } from "../network/packets/types/ChatMessageType.mjs"
 import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
+import { SetDifficulty } from "../network/packets/server/SetDifficulty.mjs"
 import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
@@ -31,6 +33,7 @@ import { StartGame } from "../network/packets/server/StartGame.mjs"
 import { PlayerFog } from "../network/packets/server/PlayerFog.mjs"
 import { RainLevel } from "../network/packets/types/RainLevel.mjs"
 import { TrimData } from "../network/packets/server/TrimData.mjs"
+import { Transfer } from "../network/packets/server/Transfer.mjs"
 import { Respawn } from "../network/packets/server/Respawn.mjs"
 import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
@@ -44,14 +47,13 @@ import { Language } from "../config/Language.mjs"
 import { ChatColor } from "../chat/ChatColor.mjs"
 import { Biome } from "../world/types/Biome.mjs"
 import { Logger } from "../logger/Logger.mjs"
-import { Toast } from "./Toast.mjs"
 import { World } from "../world/World.mjs"
 import { Gamemode } from "./Gamemode.mjs"
 import { UUID } from "../utils/UUID.mjs"
+import { Toast } from "./Toast.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import {SetDifficulty} from "../network/packets/server/SetDifficulty.mjs";
-import {Transfer} from "../network/packets/server/Transfer.mjs";
+import {TeleportReason} from "./TeleportReason.mjs";
 
 class Player extends Entity {
 	/** @type {string} */
@@ -77,6 +79,9 @@ class Player extends Entity {
 
 	/** @type {number} */
 	render_distance = 0
+
+	/** @type {bigint} */
+	movement_tick = 0n
 
 	/**
 	 * @param {string} name 
@@ -112,10 +117,13 @@ class Player extends Entity {
 
 			this.#send_packets()
 			this.#send_chunks()
-			this.send_play_status("player_spawn")
 			this.set_difficulty(this.server.difficulty)
 			this.set_commands_enabled(true)
 			this.#spawn()
+
+			setTimeout(() => {
+				this.send_play_status("player_spawn")
+			}, 1000)
 		}
 
 		const ticking_interval = setInterval(() => {
@@ -615,7 +623,7 @@ class Player extends Entity {
 	 * @param {string} gamemode
 	 */
 	set_gamemode(gamemode) {
-		EventEmitter.emit(
+			EventEmitter.emit(
 			new Event(
 				EventType.PlayerGamemodeChange,
 				{
@@ -625,10 +633,9 @@ class Player extends Entity {
 				(() => {
 					this.gamemode = gamemode
 
-					const update_player_game_type = new UpdatePlayerGameType()
-					update_player_game_type.gamemode = gamemode
-					update_player_game_type.player_unique_id = String(this.runtime_id)
-					update_player_game_type.write(this.connection)
+					const set_player_game_type = new SetPlayerGameType()
+					set_player_game_type.gamemode = gamemode
+					set_player_game_type.write(this.connection)
 				})
 			)
 		)
@@ -649,6 +656,43 @@ class Player extends Entity {
 					const chunk_radius_update = new ChunkRadiusUpdate()
 					chunk_radius_update.chunk_radius = radius
 					chunk_radius_update.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {Vec3} position
+	 * @param {Vec3} [rotation=new Vec3(0, 0, 0)]
+	 * @param {string} [reason=TeleportReason.Unknown]
+	 */
+	teleport(position, rotation= new Vec3(0, 0, 0), reason = TeleportReason.Unknown) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerTeleport,
+				{
+					player: this,
+					position,
+					rotation,
+					reason
+				},
+				(() => {
+					const move_entity_delta = new MoveEntityDelta()
+					move_entity_delta.coordinates = position
+					move_entity_delta.coordinates_rotation = rotation
+					move_entity_delta.runtime_entity_id = this.runtime_id
+					move_entity_delta.flags = {
+						has_x: true,
+						has_y: true,
+						has_z: true,
+						has_rot_x: undefined,
+						has_rot_y: undefined,
+						has_rot_z: true,
+						on_ground: false,
+						teleport: true,
+						force_move: true
+					}
+					move_entity_delta.write(this.connection)
 				})
 			)
 		)
@@ -679,6 +723,16 @@ class Player extends Entity {
 	 */
 	get_ip() {
 		return this.connection.connection.address
+	}
+
+	/**
+	 * @return {boolean}
+	 */
+	can_fly() {
+		return this.gamemode === Gamemode.Creative
+				|| this.gamemode === Gamemode.Spectator
+				|| this.gamemode === Gamemode.CreativeSpectator
+				|| this.gamemode === Gamemode.SurvivalSpectator
 	}
 }
 

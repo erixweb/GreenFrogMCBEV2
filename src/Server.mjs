@@ -1,6 +1,7 @@
 import { NetworkStackLatency } from './network/packets/client/NetworkStackLatency.mjs'
 import { RequestChunkRadius } from './network/packets/client/RequestChunkRadius.mjs'
 import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
+import { PlayerAuthInput } from "./network/packets/client/PlayerAuthInput.mjs"
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { PluginLoader } from './plugins/PluginLoader.mjs'
 import { ServerConfig } from './server/ServerConfig.mjs'
@@ -76,6 +77,7 @@ class Server {
     #packet_handlers = [
         new NetworkStackLatency(),
         new RequestChunkRadius(),
+        new PlayerAuthInput(),
         new Text()
     ]
 
@@ -211,7 +213,7 @@ class Server {
                  * @param {object} params 
                  */
                 connection.queue = (name, params) => {
-                    Logger.debug(`Sent to client ${player.name}: ${name} - ${JSON.stringify(params)}`)
+                    Logger.debug(`Sent to client ${player.name}: ${name} - ${this.serialize_packet_params(params)}`)
 
                     connection._queue(name, params)
                 }
@@ -291,6 +293,17 @@ class Server {
      */
     async shutdown() {
         await this._server?.close()
+    }
+
+    /**
+     * https://github.com/GreenFrogMCBE/Protocol/blob/master/src/datatypes/util.js#L34C21-L34C34
+     *
+     * @param {object} obj
+     * @param {any} fmt
+     * @return {string}
+     */
+    serialize_packet_params(obj = {}, fmt) {
+        return JSON.stringify(obj, (k, v) => typeof v === 'bigint' ? v.toString() : v, fmt)
     }
 }
 
