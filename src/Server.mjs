@@ -54,6 +54,9 @@ class Server {
         )
     ]
 
+    /** @type {World} */
+    default_world = this.worlds[0]
+
     /** @type {Player[]} */
     players = []
 
@@ -159,6 +162,8 @@ class Server {
 
     start() {
         if (!this.internal) this.listen()
+
+        this.default_world.prepare_generator()
 
         this.plugin_loader.load()
 
