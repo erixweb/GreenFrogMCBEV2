@@ -1,3 +1,4 @@
+import { FormButton } from "../../../forms/types/FormButton.mjs"
 import { FormType } from "../../../forms/types/FormType.mjs"
 import { Packet } from "../Packet.mjs"
 
@@ -13,6 +14,7 @@ class FormRequest extends Packet {
     /** @type {FormButton | undefined} */
     buttons
 
+    /** @type {any[] | undefined} */
     actions = []
 
     /** @type {string | undefined} */
