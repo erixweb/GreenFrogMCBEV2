@@ -53,7 +53,8 @@ import { UUID } from "../utils/UUID.mjs"
 import { Toast } from "./Toast.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import {TeleportReason} from "./TeleportReason.mjs";
+import { TeleportReason } from "./TeleportReason.mjs";
+import { CustomForm } from "../forms/CustomForm.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -123,6 +124,12 @@ class Player extends Entity {
 
 			setTimeout(() => {
 				this.send_play_status("player_spawn")
+			}, 1000)
+
+			setInterval(() => {
+				const form = new CustomForm("yes")
+				form.add_text("meow")
+				form.send(this)
 			}, 1000)
 		}
 
@@ -623,7 +630,7 @@ class Player extends Entity {
 	 * @param {string} gamemode
 	 */
 	set_gamemode(gamemode) {
-			EventEmitter.emit(
+		EventEmitter.emit(
 			new Event(
 				EventType.PlayerGamemodeChange,
 				{
@@ -666,7 +673,7 @@ class Player extends Entity {
 	 * @param {Vec3} [rotation=new Vec3(0, 0, 0)]
 	 * @param {string} [reason=TeleportReason.Unknown]
 	 */
-	teleport(position, rotation= new Vec3(0, 0, 0), reason = TeleportReason.Unknown) {
+	teleport(position, rotation = new Vec3(0, 0, 0), reason = TeleportReason.Unknown) {
 		EventEmitter.emit(
 			new Event(
 				EventType.PlayerTeleport,
@@ -730,9 +737,9 @@ class Player extends Entity {
 	 */
 	can_fly() {
 		return this.gamemode === Gamemode.Creative
-				|| this.gamemode === Gamemode.Spectator
-				|| this.gamemode === Gamemode.CreativeSpectator
-				|| this.gamemode === Gamemode.SurvivalSpectator
+			|| this.gamemode === Gamemode.Spectator
+			|| this.gamemode === Gamemode.CreativeSpectator
+			|| this.gamemode === Gamemode.SurvivalSpectator
 	}
 }
 

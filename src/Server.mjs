@@ -1,7 +1,8 @@
 import { NetworkStackLatency } from './network/packets/client/NetworkStackLatency.mjs'
 import { RequestChunkRadius } from './network/packets/client/RequestChunkRadius.mjs'
-import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
+import { ModalFormResponse } from "./network/packets/client/ModalFormResponse.mjs"
 import { PlayerAuthInput } from "./network/packets/client/PlayerAuthInput.mjs"
+import { ChatMessageType } from './network/packets/types/ChatMessageType.mjs'
 import { EventEmitter, Event } from '@kotinash/better-events'
 import { PluginLoader } from './plugins/PluginLoader.mjs'
 import { ServerConfig } from './server/ServerConfig.mjs'
@@ -77,6 +78,7 @@ class Server {
     #packet_handlers = [
         new NetworkStackLatency(),
         new RequestChunkRadius(),
+        new ModalFormResponse(),
         new PlayerAuthInput(),
         new Text()
     ]

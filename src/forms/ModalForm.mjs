@@ -69,6 +69,8 @@ class ModalForm extends Form {
             .get_constructed_packet()
             .write(player.connection)
 
+        FormManager.FORMS.push(this)
+
         this.on_send(player, this)
     }
 }

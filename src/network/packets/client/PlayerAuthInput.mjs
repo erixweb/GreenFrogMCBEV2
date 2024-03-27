@@ -2,6 +2,8 @@ import { MovementValidator } from "../../../player/MovementValidator.mjs"
 import { TeleportReason } from "../../../player/TeleportReason.mjs"
 import { EventEmitter, Event } from "@kotinash/better-events"
 import { EventType } from "../../../events/EventType.mjs"
+import { Language } from "../../../config/Language.mjs"
+import { Logger } from "../../../logger/Logger.mjs"
 import { Packet } from "../Packet.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
@@ -41,6 +43,8 @@ class PlayerAuthInput extends Packet {
                                 EventType.PlayerMovementValidationFail,
                                 params,
                                 (() => {
+                                    Logger.warning(Language.get_key("player.invalid_movement", [ player.name, player.location.toArray() ]))
+
                                     player.teleport(player.location, new Vec3(0, 0, 0), TeleportReason.MovementValidation)
                                 })
                             )

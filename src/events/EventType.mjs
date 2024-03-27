@@ -22,6 +22,8 @@ class EventType {
 	static PlayerJoin = "playerJoin"
 	static PlayerTick = "playerTick"
 
+	static FormResponse = "formResponse"
+
 	static EntityTick = "entityTick"
 
 	static PacketReceived = "packetReceived"

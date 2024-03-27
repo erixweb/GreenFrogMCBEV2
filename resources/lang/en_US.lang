@@ -9,6 +9,8 @@ debug.enabled=Debugging is enabled, this may cause lag while sending large packe
 
 player.connected=Player "%0" connected (IP: %1)
 
+player.invalid_movement="%0" sent an invalid movement packet, teleporting him to %1
+
 chat.format=<%0> %1
 
 player.spawned=Player "%0" spawned
