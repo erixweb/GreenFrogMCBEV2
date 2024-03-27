@@ -18,6 +18,9 @@ class NormalForm extends Form {
     /** @type {string} */
     content = ""
 
+    /** @type {Player | undefined} */
+    player
+
     /**
      * @type {function}
      * @param {Player} player
@@ -65,11 +68,13 @@ class NormalForm extends Form {
      * @param {Player} player
      */
     send(player) {
+        this.player = player
+
+        FormManager.FORMS.push(this)
+
         this
             .get_constructed_packet()
             .write(player.connection)
-
-        FormManager.FORMS.push(this)
 
         this.on_send(player, this)
     }

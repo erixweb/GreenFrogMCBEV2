@@ -11,17 +11,9 @@ class ModalFormResponse extends Packet {
      * @param {object} packet
      */
     read(player, packet) {
-        const params = { packet }
+        const { cancel_reason, form_id, data } = packet.data.params
 
-        const { cancel_reason, form_id, data } = params
-
-        let form = null
-
-        FormManager.FORMS.forEach((f) => {
-            if (f.id === form_id) {
-                form = f
-            }
-        })
+        const form = FormManager.FORMS.filter(created_form => created_form.id === form_id && created_form.player.name === player.name)
 
         if (!form) {
             return

@@ -42,6 +42,7 @@ import { Text } from "../network/packets/server/Text.mjs"
 import { Entity, EntityType } from "../entity/Entity.js"
 import { Dimension } from "../world/types/Dimension.mjs"
 import { Generator } from "../world/types/Generator.mjs"
+import { TeleportReason } from "./TeleportReason.mjs"
 import { EventType } from "../events/EventType.mjs"
 import { Language } from "../config/Language.mjs"
 import { ChatColor } from "../chat/ChatColor.mjs"
@@ -53,8 +54,6 @@ import { UUID } from "../utils/UUID.mjs"
 import { Toast } from "./Toast.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
-import { TeleportReason } from "./TeleportReason.mjs";
-import { CustomForm } from "../forms/CustomForm.mjs"
 
 class Player extends Entity {
 	/** @type {string} */
@@ -124,12 +123,6 @@ class Player extends Entity {
 
 			setTimeout(() => {
 				this.send_play_status("player_spawn")
-			}, 1000)
-
-			setInterval(() => {
-				const form = new CustomForm("yes")
-				form.add_text("meow")
-				form.send(this)
 			}, 1000)
 		}
 
