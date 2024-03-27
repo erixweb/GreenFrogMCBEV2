@@ -7,29 +7,24 @@ class Gamemode {
 	static Fallback = "fallback"
 	static Spectator = "spectator"
 
+
 	/**
 	 * @param {Gamemode} gamemode 
 	 * @returns {number | undefined} 
 	 */
 	static to_number(gamemode) {
-		switch (gamemode) {
-			case this.Survival:
-				return 0
-			case this.Creative:
-				return 1
-			case this.Adventure:
-				return 2
-			case this.SurvivalSpectator:
-				return 3
-			case this.CreativeSpectator:
-				return 4
-			case this.Fallback:
-				return 5
-			case this.Spectator:
-				return 6
-			default:
-				return undefined
+		const gamemodes = {
+			"survival": 0,
+			"creative": 1,
+			"adventure": 2,
+			"survival_spectator": 3,
+			"creative_spectator": 4,
+			"fallback": 5,
+			"spectator": 6
 		}
+		
+
+		return gamemodes[gamemode]
 	}
 }
 
