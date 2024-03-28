@@ -28,23 +28,9 @@ class ResourcePackStack extends Packet {
 	 * @param {import("frog-protocol").Connection} connection 
 	 */
 	write(connection) {
-		const experiments_converted = []
-
-		for (const experiment of this.experiments) {
-			experiments_converted.push(experiment.toJSON())
-		}
-
-		const behaviour_packs_converted = []
-
-		for (const pack of this.behavior_packs) {
-			behaviour_packs_converted.push(pack.toJSON())
-		}
-
-		const resource_packs_converted = []
-
-		for (const pack of this.resource_packs) {
-			resource_packs_converted.push(pack.toJSON())
-		}
+		const experiments_converted = this.experiments.filter((expirement) => { expirement.to_json() })
+		const behaviour_packs_converted = this.behavior_packs.filter((behaviour) => { behaviour.to_json() })
+		const resource_packs_converted = this.resource_packs.filter((resource) => { resource.to_json() })
 
 		connection.queue(this.name, {
 			must_accept: this.must_accept,

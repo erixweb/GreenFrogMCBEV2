@@ -14,7 +14,7 @@ class EduResourceUri {
 		this.link_uri = link_uri
 	}
 
-	toJSON() {
+	to_json() {
 		return {
 			button_name: this.button_name,
 			link_uri: this.link_uri

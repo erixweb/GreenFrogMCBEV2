@@ -5,7 +5,7 @@ class Experiment {
 	/** @type {boolean | undefined} */
 	enabled
 
-	toJSON() {
+	to_json() {
 		return {
 			name: this.name,
 			enabled: this.enabled

@@ -20,7 +20,7 @@ class BehaviourPackInfos {
 	/** @type {boolean | undefined} */
 	has_scripts
 
-	toJSON() {
+	to_json() {
 		return {
 			uuid: this.uuid,
 			version: this.version,

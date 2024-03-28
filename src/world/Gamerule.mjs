@@ -29,7 +29,7 @@ class Gamerule {
 		this.value = value
 	}
 
-	toJSON() {
+	to_json() {
 		return {
 			name: this.name,
 			editable: this.editable,
