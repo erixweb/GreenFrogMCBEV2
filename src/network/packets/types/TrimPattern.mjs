@@ -14,7 +14,7 @@ class TrimPattern {
 		this.pattern = pattern
 	}
 
-	toJSON() {
+	to_json() {
 		return {
 			item_name: this.item_name,
 			pattern: this.pattern

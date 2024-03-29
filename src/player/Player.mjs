@@ -19,11 +19,13 @@ import { CreativeContent } from "../network/packets/server/CreativeContent.mjs"
 import { MoveEntityDelta } from "../network/packets/server/MoveEntityDelta.mjs"
 import { EditorWorldType } from "../network/packets/types/EditorWorldType.mjs"
 import { ChatMessageType } from "../network/packets/types/ChatMessageType.mjs"
+import { CameraPresents } from "../network/packets/server/CameraPresents.mjs"
 import { EduResourceUri } from "../network/packets/types/EduResourceUri.mjs"
 import { SetDifficulty } from "../network/packets/server/SetDifficulty.mjs"
 import biomes from "../../resources/json/biomes.json" with { type: "json" }
 import itemstates from "../../world/itemstates.json" with { type: "json" }
 import gamerules from "../../world/gamerules.json" with { type: "json" }
+import { CameraPreset } from "../network/packets/types/CameraPreset.mjs"
 import { PropertyData } from "../network/packets/types/PropertyData.mjs"
 import { PlayStatus } from "../network/packets/server/PlayStatus.mjs"
 import { LevelChunk } from "../network/packets/server/LevelChunk.mjs"
@@ -83,6 +85,9 @@ class Player extends Entity {
 	/** @type {bigint} */
 	movement_tick = 0n
 
+	/** @type {CameraPresent[]} */
+	presets = []
+
 	/**
 	 * @param {string} name 
 	 * @param {import("frog-protocol").Connection} connection
@@ -119,6 +124,14 @@ class Player extends Entity {
 			this.#send_chunks()
 			this.set_difficulty(this.server.difficulty)
 			this.set_commands_enabled(true)
+			this.set_camera_presets(
+				[
+					new CameraPreset("minecraft:first_person"),
+					new CameraPreset("minecraft:free"),
+					new CameraPreset("minecraft:third_person"),
+					new CameraPreset("minecraft:third_person_front"),
+				]
+			)
 			this.#spawn()
 
 			setTimeout(() => {
@@ -713,6 +726,28 @@ class Player extends Entity {
 					const set_difficulty = new SetDifficulty()
 					set_difficulty.difficulty = difficulty
 					set_difficulty.write(this.connection)
+				})
+			)
+		)
+	}
+
+	/**
+	 * @param {CameraPresents[]} presets
+	 */
+	set_camera_presets(presets) {
+		EventEmitter.emit(
+			new Event(
+				EventType.PlayerCameraPresetsUpdate,
+				{
+					player: this,
+					presets
+				},
+				(() => {
+					this.presets = presets
+
+					const camera_presets = new CameraPresents()
+					camera_presets.presets = presets
+					camera_presets.write(this.connection)
 				})
 			)
 		)

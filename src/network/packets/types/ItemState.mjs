@@ -19,7 +19,7 @@ class ItemState {
 		this.compontent_based = compontent_based
 	}
 
-	toJSON() {
+	to_json() {
 		return {
 			name: this.name,
 			runtime_id: this.runtime_id,

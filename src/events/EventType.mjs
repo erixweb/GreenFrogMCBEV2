@@ -2,6 +2,7 @@ class EventType {
 	static PlayerMovementValidationFail = "playerMovementValidationFail"
 	static PlayerConnectionInitialized = "playerConnectionInitialized"
 	static PlayerSetAdventureSettings = "playerSetAdventureSettings"
+	static PlayerCameraPresetsUpdate = "playerCameraPresetsUpdate"
 	static PlayerRequestChunkRadius = "playerRequestChunkRadius"
 	static PlayerSetCommandsEnabled = "playerSetCommandsEnabled"
 	static PlayerChunkRadiusUpdate = "playerChunkRadiusUpdate"

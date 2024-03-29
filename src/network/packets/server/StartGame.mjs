@@ -247,18 +247,12 @@ class StartGame extends Packet {
 	 * @param {import("frog-protocol").Connection} connection 
 	 */
 	write(connection) {
-		let gamerules_converted = this.gamerules || []
-
-		if (this.gamerules[0] instanceof Gamerule) {
-			gamerules_converted = this.gamerules.map(gamerule => gamerule.toJSON())
-		}
-
-		const expirements_converted = this.experiments.map(expirement => expirement.toJSON())
+		const expirements_converted = this.experiments.map(expirement => expirement.to_json())
 
 		let itemstates_converted = this.itemstates || []
 
 		if (this.gamerules[0] instanceof ItemState) {
-			itemstates_converted = this.itemstates.map(itemstate => itemstate.toJSON())
+			itemstates_converted = this.itemstates.map(itemstate => itemstate.to_json())
 		}
 
 		connection.queue(this.name, {
@@ -292,7 +286,7 @@ class StartGame extends Packet {
 			platform_broadcast_mode: this.platform_broadcast_mode,
 			enable_commands: this.enable_commands,
 			is_texturepacks_required: this.is_texturepacks_required,
-			gamerules: gamerules_converted,
+			gamerules: this.gamerules,
 			experiments: expirements_converted,
 			experiments_previously_used: this.experiments_previously_used,
 			bonus_chest: this.bonus_chest,
@@ -313,7 +307,7 @@ class StartGame extends Packet {
 			limited_world_width: this.limited_world_width,
 			limited_world_length: this.limited_world_length,
 			is_new_nether: this.is_new_nether,
-			edu_resource_uri: this.edu_resource_uri.toJSON(),
+			edu_resource_uri: this.edu_resource_uri.to_json(),
 			chat_restriction_level: this.chat_restriction_level,
 			disable_player_interactions: this.disable_player_interactions,
 			level_id: this.level_id,
@@ -330,7 +324,7 @@ class StartGame extends Packet {
 			multiplayer_correlation_id: this.multiplayer_correlation_id,
 			server_authoritative_inventory: this.server_authoritative_inventory,
 			engine: this.engine,
-			property_data: this.property_data.toJSON(),
+			property_data: this.property_data.to_json(),
 			block_pallette_checksum: this.block_pallette_checksum,
 			world_template_id: this.world_template_id,
 			client_side_generation: this.client_side_generation,

@@ -19,7 +19,7 @@ class TrimMaterial {
 		this.item_name = item_name
 	}
 
-	toJSON() {
+	to_json() {
 		return {
 			material: this.material,
 			color: this.color,

@@ -14,7 +14,7 @@ class ResourcePackLink {
 		this.url = url
 	}
 
-	toJSON() {
+	to_json() {
 		return { 
 			id: this.id, 
 			url: this.url 

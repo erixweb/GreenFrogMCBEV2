@@ -19,7 +19,7 @@ class PropertyData {
 		this.value = value
 	}
 
-	toJSON() {
+	to_json() {
 		return {
 			type: this.type,
 			name: this.name,

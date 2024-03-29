@@ -1,3 +1,4 @@
+import { Math } from "../../../utils/Math.mjs"
 import { Packet } from "../Packet.mjs"
 import { Vec3 } from "vec3"
 import Vec2 from "vec2"
@@ -19,7 +20,7 @@ class NetworkChunkPublisherUpdate extends Packet {
 	 */
 	write(connection) {
 		connection.queue(this.name, {
-			coordinates: this.coordinates,
+			coordinates: Math.vec3_to_json(this.coordinates),
 			radius: this.radius,
 			saved_chunks: this.saved_chunks
 		})

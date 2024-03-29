@@ -23,7 +23,7 @@ class ResourcePackInfos {
 	/** @type {boolean | undefined} */
 	rtx_enabled
 
-	toJSON() {
+	to_json() {
 		return {
 			uuid: this.uuid,
 			version: this.version,
