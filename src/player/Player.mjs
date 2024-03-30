@@ -41,7 +41,7 @@ import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
 import { ServerConfig } from "../server/ServerConfig.mjs"
 import { Text } from "../network/packets/server/Text.mjs"
-import { Entity, EntityType } from "../entity/Entity.js"
+import { Entity, EntityType } from "../entity/Entity.mjs"
 import { Dimension } from "../world/types/Dimension.mjs"
 import { Generator } from "../world/types/Generator.mjs"
 import { TeleportReason } from "./TeleportReason.mjs"
@@ -85,7 +85,7 @@ class Player extends Entity {
 	/** @type {bigint} */
 	movement_tick = 0n
 
-	/** @type {CameraPresent[]} */
+	/** @type {CameraPreset[]} */
 	presets = []
 
 	/**
@@ -103,7 +103,9 @@ class Player extends Entity {
 
 		this.world = server.worlds[0]
 
+		this.world.players.push(this)
 		this.server.players.push(this)
+		this.server.entities.push(this)
 
 		EventEmitter.emit(
 			new Event(

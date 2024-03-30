@@ -16,6 +16,7 @@ import { Language } from './config/Language.mjs'
 import { Address } from './network/Address.mjs'
 import { Logger } from './logger/Logger.mjs'
 import { Player } from './player/Player.mjs'
+import { Entity } from './entity/Entity.mjs'
 import { World } from './world/World.mjs'
 import { Debug } from './utils/Debug.mjs'
 
@@ -61,6 +62,9 @@ class Server {
 
     /** @type {Player[]} */
     players = []
+
+    /** @type {Entity[]} */
+    entities = []
 
     /** @type {number} */
     current_tick = 0
