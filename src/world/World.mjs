@@ -82,6 +82,9 @@ class World {
 		)
 	}
 
+	/** 
+	 * @param {Vec3} position
+	 */
 	break_block(position) {
 		EventEmitter.emit(
 			new Event(
