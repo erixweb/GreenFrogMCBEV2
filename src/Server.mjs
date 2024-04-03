@@ -8,6 +8,7 @@ import { PluginLoader } from './plugins/PluginLoader.mjs'
 import { ServerConfig } from './server/ServerConfig.mjs'
 import { Text } from './network/packets/client/Text.mjs'
 import { Seed } from './network/packets/types/Seed.mjs'
+import { Scheduler } from "./scheduler/Scheduler.mjs"
 import { Packet } from './network/packets/Packet.mjs'
 import { Flat } from "./world/generators/Flat.mjs"
 import { EventType } from './events/EventType.mjs'
@@ -93,6 +94,9 @@ class Server {
     /** @type {string} */
     raknet_backend = "raknet-native"
 
+    /** @type {Scheduler} */
+    scheduler = new Scheduler()
+
     /**
      * @param {Address} address
      * @param {string} [motd=ServerConfig.get("motd")]
@@ -164,6 +168,8 @@ class Server {
 
     #start_ticking() {
         setInterval(() => {
+            this.scheduler.tick()
+
             this.#tick()
         }, ServerConfig.get_number("tick_delay"))
     }

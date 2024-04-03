@@ -32,31 +32,37 @@ class PlayerAuthInput extends Packet {
             tick
         }
 
-        EventEmitter.emit(
-            new Event(
-                EventType.PlayerMove,
-                params,
-                () => {
-                    if (!MovementValidator.is_movement_valid(player, packet, delta.abs())) {
-                        return EventEmitter.emit(
-                            new Event(
-                                EventType.PlayerMovementValidationFail,
-                                params,
-                                (() => {
-                                    Logger.warning(Language.get_key("player.invalid_movement", [ player.name, player.location.toArray() ]))
+        const handle = (() => {
+            EventEmitter.emit(
+                new Event(
+                    EventType.PlayerMove,
+                    params,
+                    () => {
+                        if (!MovementValidator.is_movement_valid(player, packet, delta.abs())) {
+                            return EventEmitter.emit(
+                                new Event(
+                                    EventType.PlayerMovementValidationFail,
+                                    params,
+                                    (() => {
+                                        Logger.warning(Language.get_key("player.invalid_movement", [ player.name, player.location.toArray() ]))
 
-                                    player.teleport(player.location, new Vec3(0, 0, 0), TeleportReason.MovementValidation)
-                                })
+                                        player.teleport(player.location, new Vec3(0, 0, 0), TeleportReason.MovementValidation)
+                                    })
+                                )
                             )
-                        )
-                    }
+                        }
 
-                    player.location = new Vec3(position.x, position.y, position.z)
-                    player.rotation = new Vec2(yaw, pitch)
-                    player.movement_tick = tick
-                }
+                        player.location = new Vec3(position.x, position.y, position.z)
+                        player.rotation = new Vec2(yaw, pitch)
+                        player.movement_tick = tick
+                    }
+                )
             )
-        )
+        })
+
+        player.server.scheduler.run_on_next_tick(() => {
+            handle()
+        })
     }
 }
 
