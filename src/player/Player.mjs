@@ -41,7 +41,7 @@ import { SetTime } from "../network/packets/server/SetTime.mjs"
 import { Event, EventEmitter } from "@kotinash/better-events"
 import { ServerConfig } from "../server/ServerConfig.mjs"
 import { Text } from "../network/packets/server/Text.mjs"
-import { Entity, EntityType } from "../entity/Entity.js"
+import { Entity, EntityType } from "../entity/Entity.mjs"
 import { Dimension } from "../world/types/Dimension.mjs"
 import { Generator } from "../world/types/Generator.mjs"
 import { TeleportReason } from "./TeleportReason.mjs"
@@ -85,7 +85,7 @@ class Player extends Entity {
 	/** @type {bigint} */
 	movement_tick = 0n
 
-	/** @type {CameraPresent[]} */
+	/** @type {CameraPreset[]} */
 	presets = []
 
 	/**
@@ -103,7 +103,9 @@ class Player extends Entity {
 
 		this.world = server.worlds[0]
 
+		this.world.players.push(this)
 		this.server.players.push(this)
+		this.server.entities.push(this)
 
 		EventEmitter.emit(
 			new Event(
@@ -134,14 +136,14 @@ class Player extends Entity {
 			)
 			this.#spawn()
 
-			setTimeout(() => {
+			this.server.scheduler.run_later(() => {
 				this.send_play_status("player_spawn")
-			}, 1000)
+			}, 200)
 		}
 
-		const ticking_interval = setInterval(() => {
+		this.server.scheduler.repeat(() => {
 			if (this.offline) {
-				clearInterval(ticking_interval)
+				return
 			}
 
 			this.#tick()
@@ -490,7 +492,7 @@ class Player extends Entity {
 				(() => {
 					const text_packet = new Text()
 					text_packet.type = type
-					text_packet.needs_translation = (type == ChatMessageType.Translation)
+					text_packet.needs_translation = (type === ChatMessageType.Translation)
 					text_packet.message = message
 					text_packet.source_name = sender
 					text_packet.platform_chat_id = String(this.runtime_id)
@@ -561,9 +563,9 @@ class Player extends Entity {
 	async get_latency(secure = true) {
 		let ms_without_reply = 0
 
-		const interval = setInterval(() => {
+		this.server.scheduler.repeat(() => {
 			ms_without_reply++
-		}, 1)
+		})
 
 		const promise = new Promise((resolve, reject) => {
 			EventEmitter.on(EventType.PacketReceived, (event) => {
@@ -576,16 +578,12 @@ class Player extends Entity {
 
 			EventEmitter.once(EventType.PacketNetworkStackLatencyResponse, (event) => {
 				if (event.connection.profile.xuid === this.connection.profile.xuid) {
-					clearInterval(interval)
-
 					resolve(ms_without_reply)
 				}
 			})
 		})
 
 		if (this.offline) {
-			clearInterval(interval)
-
 			throw new Error("Player is offline")
 		}
 

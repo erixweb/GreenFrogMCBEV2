@@ -25,7 +25,9 @@ class Text extends Packet {
 					packet
 				},
 				(() => {
-					player.server.broadcast_message(`${Language.get_key("chat.format", [ player.name, message ])}`)
+					player.server.scheduler.run_on_next_tick(() => {
+						player.server.broadcast_message(`${Language.get_key("chat.format", [ player.name, message ])}`)
+					})
 				})
 			)
 		)

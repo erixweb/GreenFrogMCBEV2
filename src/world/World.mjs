@@ -1,6 +1,11 @@
-import {Seed} from "../network/packets/types/Seed.mjs"
-import {Generator} from "./generators/Generator.mjs"
-import {Vec3} from "vec3"
+import { UpdateBlock } from "../network/packets/server/UpdateBlock.mjs"
+import { EventEmitter, Event } from "@kotinash/better-events"
+import { Seed } from "../network/packets/types/Seed.mjs"
+import { Generator } from "./generators/Generator.mjs"
+import { EventType } from "../events/EventType.mjs"
+import { Block, BlockType } from "./Block.mjs"
+import { Player } from "../player/Player.mjs"
+import { Vec3 } from "vec3"
 
 class World {
 	/** @type {string} */
@@ -15,6 +20,9 @@ class World {
 	/** @type {number} */
 	chunk_radius = 16
 
+	/** @type {Player[]} */
+	players = []
+
 	/**
 	 * @param {string} [name]
 	 * @param {Generator} [generator]
@@ -26,6 +34,10 @@ class World {
 		this.seed = seed
 		this.generator = generator
 		this.chunk_radius = chunk_radius
+
+		setInterval(() => {
+			this.#tick()
+		}, 1000)
 	}
 
 	prepare_generator() {
@@ -37,6 +49,55 @@ class World {
 	 */
 	generate_chunk() {
 		return this.generator.generate_chunk()
+	}
+
+	/**
+	 * @param {Block} block
+	 */
+	place_block(block) {
+		EventEmitter.emit(
+			new Event(
+				EventType.WorldPlaceBlock,
+				{
+					block,
+					world: this
+				},
+				(() => {
+					for (const player of this.players) {
+						const update_block = new UpdateBlock()
+						update_block.block_runtime_id = block.get_runtime_id()
+						update_block.position = block.position
+						update_block.layer = 0
+						update_block.flags = {
+							neighbors: false,
+							network: true,
+							no_graphic: false,
+							unused: false,
+							priority: false
+						}
+						update_block.write(player.connection)
+					}
+				})
+			)
+		)
+	}
+
+	/** 
+	 * @param {Vec3} position
+	 */
+	break_block(position) {
+		EventEmitter.emit(
+			new Event(
+				EventType.WorldBreakBlock,
+				{
+					position,
+					world: this
+				},
+				(() => {
+					this.place_block(new Block(BlockType.Air, position))
+				})
+			)
+		)
 	}
 
 	/** 
@@ -54,6 +115,17 @@ class World {
 			get_spawn_offset(0),
 			10,
 			get_spawn_offset(0)
+		)
+	}
+
+	#tick() {
+		EventEmitter.emit(
+			new Event(
+				EventType.WorldTick,
+				{
+					world: this
+				}
+			)
 		)
 	}
 }

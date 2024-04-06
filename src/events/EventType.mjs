@@ -25,6 +25,10 @@ class EventType {
 
 	static FormResponse = "formResponse"
 
+	static WorldTick = "worldTick"
+	static WorldPlaceBlock = "worldPlaceBlock"
+	static WorldBreakBlock = "worldBreakBlock"
+
 	static EntityTick = "entityTick"
 
 	static PacketReceived = "packetReceived"
